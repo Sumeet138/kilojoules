@@ -50,7 +50,7 @@ export default function BMITracker() {
   };
 
   const latest = records[0];
-  const bmiStyle = latest ? BMI_COLORS[latest.bmiCategory] || BMI_COLORS.NORMAL : null;
+  const bmiStyle = latest ? BMI_COLORS[latest.category] || BMI_COLORS.NORMAL : null;
 
   return (
     <div className="mt-4">
@@ -109,7 +109,7 @@ export default function BMITracker() {
                 {latest.bmi}
               </Typography>
               <Typography className={`mb-2 font-semibold ${bmiStyle.text}`}>
-                {latest.bmiCategory}
+                {latest.category}
               </Typography>
             </div>
             <div className="flex flex-col gap-1 text-sm">
@@ -143,7 +143,7 @@ export default function BMITracker() {
             </thead>
             <tbody>
               {records.map((r, idx) => {
-                const s = BMI_COLORS[r.bmiCategory];
+                const s = BMI_COLORS[r.category];
                 return (
                   <tr key={r.id} className={`border-t border-gym-beige-dark ${idx % 2 === 0 ? "" : "bg-gym-beige/30"}`}>
                     <td className="px-4 py-3 text-gym-text-secondary">{r.recordDate}</td>
@@ -152,7 +152,7 @@ export default function BMITracker() {
                     <td className="px-4 py-3 font-semibold">{r.bmi}</td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${s?.bg} ${s?.text}`}>
-                        {r.bmiCategory}
+                        {r.category}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gym-text-muted">{r.notes || "—"}</td>

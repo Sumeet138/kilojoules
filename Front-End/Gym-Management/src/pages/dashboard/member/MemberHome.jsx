@@ -6,6 +6,7 @@ import { fetchMemberBookings } from "../../../store/slices/classBookingSlice";
 import { fetchBMIHistory } from "../../../store/slices/bmiSlice";
 import { fetchMemberTransactions } from "../../../store/slices/transactionSlice";
 import { fetchWorkouts } from "../../../store/slices/workoutHistorySlice";
+import { FiCalendar, FiActivity, FiTrendingUp, FiDollarSign } from "react-icons/fi";
 
 export default function MemberHome() {
   const dispatch = useDispatch();
@@ -32,86 +33,45 @@ export default function MemberHome() {
     .toFixed(2);
 
   const stats = [
-    {
-      color: "warm",
-      icon: "📅",
-      title: "Classes Booked",
-      value: bookings.length,
-      footer: "Total bookings",
-    },
-    {
-      color: "brown",
-      icon: "💪",
-      title: "Workouts Logged",
-      value: workouts.length,
-      footer: "Keep it up!",
-    },
-    {
-      color: "beige",
-      icon: "⚖️",
-      title: "Latest BMI",
-      value: latestBMI ? `${latestBMI.bmi}` : "—",
-      footer: latestBMI ? latestBMI.bmiCategory : "No record yet",
-    },
-    {
-      color: "green",
-      icon: "💰",
-      title: "Total Spent",
-      value: `₹${totalSpent}`,
-      footer: "All transactions",
-    },
+    { color: "warm",  icon: <FiCalendar className="w-5 h-5" />,    title: "Classes Booked",  value: bookings.length,                            footer: "Total bookings" },
+    { color: "brown", icon: <FiActivity className="w-5 h-5" />,    title: "Workouts Logged", value: workouts.length,                            footer: "Keep it up!" },
+    { color: "blue",  icon: <FiTrendingUp className="w-5 h-5" />,  title: "Latest BMI",      value: latestBMI ? `${latestBMI.bmi}` : "\u2014", footer: latestBMI ? latestBMI.category : "No record yet" },
+    { color: "green", icon: <FiDollarSign className="w-5 h-5" />,  title: "Total Spent",     value: `\u20B9${totalSpent}`,                     footer: "All transactions" },
   ];
 
   return (
-    <div className="mt-4">
-      <div className="mb-6">
-        <Typography variant="h4" className="font-bold text-gym-text-primary">
-          Welcome back, {memberData.firstName || "Member"} 👋
-        </Typography>
-        <Typography className="text-gym-text-muted mt-1">
-          Here's a snapshot of your fitness journey
-        </Typography>
+    <div className="mt-6">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900">
+          Welcome back, {memberData.firstName || "Member"}
+        </h2>
+        <p className="text-gray-400 text-sm mt-1">Here's a snapshot of your fitness journey</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 mb-8">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-8">
         {stats.map(({ color, icon, title, value, footer }) => (
-          <StatisticsCard
-            key={title}
-            color={color}
-            icon={<span className="text-2xl">{icon}</span>}
-            title={title}
-            value={String(value)}
-            footer={<span className="text-gym-text-muted text-xs">{footer}</span>}
-          />
+          <StatisticsCard key={title} color={color} icon={icon} title={title} value={String(value)} footer={footer} />
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Recent Bookings */}
-        <div className="bg-gym-cream border border-gym-beige-dark rounded-xl p-5 shadow-sm">
-          <Typography variant="h6" className="font-bold text-gym-text-primary mb-4">
-            Recent Bookings
-          </Typography>
+        <div className="rounded-2xl border border-gray-100 bg-white p-5">
+          <h3 className="font-semibold text-gray-900 mb-4 text-sm">Recent Bookings</h3>
           {bookings.slice(0, 5).length === 0 ? (
-            <Typography className="text-gym-text-muted text-sm">No bookings yet.</Typography>
+            <p className="text-gray-400 text-sm">No bookings yet.</p>
           ) : (
             <ul className="flex flex-col gap-3">
               {bookings.slice(0, 5).map((b) => (
-                <li key={b.id} className="flex items-center justify-between border-b border-gym-beige pb-2">
+                <li key={b.id} className="flex items-center justify-between pb-3 border-b border-gray-50 last:border-0">
                   <div>
-                    <Typography variant="small" className="font-semibold text-gym-text-primary">
-                      {b.fitnessClass?.className || "Class"}
-                    </Typography>
-                    <Typography variant="small" className="text-gym-text-muted">
-                      {b.bookingDate}
-                    </Typography>
+                    <p className="text-sm font-medium text-gray-900">{b.fitnessClass?.className || "Class"}</p>
+                    <p className="text-xs text-gray-400">{b.bookingDate}</p>
                   </div>
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                    b.status === "ATTENDED"
-                      ? "bg-green-100 text-green-700"
-                      : b.status === "CANCELLED"
-                      ? "bg-red-100 text-red-600"
-                      : "bg-gym-beige text-gym-warm-dark"
+                  <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
+                    b.status === "ATTENDED" ? "bg-emerald-50 text-emerald-600"
+                    : b.status === "CANCELLED" ? "bg-red-50 text-red-500"
+                    : "bg-orange-50 text-orange-600"
                   }`}>
                     {b.status}
                   </span>
@@ -122,28 +82,21 @@ export default function MemberHome() {
         </div>
 
         {/* Recent Workouts */}
-        <div className="bg-gym-cream border border-gym-beige-dark rounded-xl p-5 shadow-sm">
-          <Typography variant="h6" className="font-bold text-gym-text-primary mb-4">
-            Recent Workouts
-          </Typography>
+        <div className="rounded-2xl border border-gray-100 bg-white p-5">
+          <h3 className="font-semibold text-gray-900 mb-4 text-sm">Recent Workouts</h3>
           {workouts.slice(0, 5).length === 0 ? (
-            <Typography className="text-gym-text-muted text-sm">No workouts logged yet.</Typography>
+            <p className="text-gray-400 text-sm">No workouts logged yet.</p>
           ) : (
             <ul className="flex flex-col gap-3">
               {workouts.slice(0, 5).map((w) => (
-                <li key={w.id} className="flex items-center justify-between border-b border-gym-beige pb-2">
+                <li key={w.id} className="flex items-center justify-between pb-3 border-b border-gray-50 last:border-0">
                   <div>
-                    <Typography variant="small" className="font-semibold text-gym-text-primary">
-                      {w.exerciseName}
-                    </Typography>
-                    <Typography variant="small" className="text-gym-text-muted">
-                      {w.sets} sets × {w.reps} reps
-                      {w.weightKg ? ` @ ${w.weightKg}kg` : ""}
-                    </Typography>
+                    <p className="text-sm font-medium text-gray-900">{w.exerciseName}</p>
+                    <p className="text-xs text-gray-400">
+                      {w.sets}s &times; {w.reps}r{w.weightKg ? ` @ ${w.weightKg}kg` : ""}
+                    </p>
                   </div>
-                  <Typography variant="small" className="text-gym-text-muted">
-                    {w.workoutDate}
-                  </Typography>
+                  <span className="text-xs text-gray-400">{w.workoutDate}</span>
                 </li>
               ))}
             </ul>

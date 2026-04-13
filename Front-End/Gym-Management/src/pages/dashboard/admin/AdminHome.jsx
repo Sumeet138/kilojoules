@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Typography } from "@material-tailwind/react";
 import { StatisticsCard } from "../../../widgets/cards";
 import { fetchAllTrainers } from "../../../store/slices/trainerSlice";
 import { fetchFitnessClasses } from "../../../store/slices/fitnessClassSlice";
 import { fetchAllTransactions } from "../../../store/slices/transactionSlice";
 import { getAllMembers } from "../../../API/ApiStore";
+import { FiUsers, FiActivity, FiCalendar, FiDollarSign } from "react-icons/fi";
 
 export default function AdminHome() {
   const dispatch = useDispatch();
@@ -28,79 +28,54 @@ export default function AdminHome() {
     .toFixed(2);
 
   const stats = [
-    { color: "warm", icon: "👥", title: "Total Members", value: memberCount, footer: "Registered members" },
-    { color: "brown", icon: "🏋️", title: "Trainers", value: trainers.length, footer: "Active trainers" },
-    { color: "blue", icon: "📅", title: "Fitness Classes", value: classes.length, footer: "Active classes" },
-    { color: "green", icon: "💰", title: "Revenue", value: `₹${totalRevenue}`, footer: "Completed transactions" },
+    { color: "warm",  icon: <FiUsers className="w-5 h-5" />,      title: "Total Members",   value: memberCount,         footer: "Registered members" },
+    { color: "brown", icon: <FiActivity className="w-5 h-5" />,   title: "Trainers",         value: trainers.length,     footer: "Active trainers" },
+    { color: "blue",  icon: <FiCalendar className="w-5 h-5" />,   title: "Fitness Classes",  value: classes.length,      footer: "Active classes" },
+    { color: "green", icon: <FiDollarSign className="w-5 h-5" />, title: "Revenue",          value: `\u20B9${totalRevenue}`, footer: "Completed transactions" },
   ];
 
   return (
-    <div className="mt-4">
-      <div className="mb-6">
-        <Typography variant="h4" className="font-bold text-gym-text-primary">
-          Admin Dashboard 👑
-        </Typography>
-        <Typography className="text-gym-text-muted mt-1">
-          Welcome, {adminData.firstName || "Admin"}. Full system overview below.
-        </Typography>
+    <div className="mt-6">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900">Admin Dashboard</h2>
+        <p className="text-gray-400 text-sm mt-1">Welcome, {adminData.firstName || "Admin"}. Full system overview below.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 mb-8">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-8">
         {stats.map(({ color, icon, title, value, footer }) => (
-          <StatisticsCard
-            key={title}
-            color={color}
-            icon={<span className="text-2xl">{icon}</span>}
-            title={title}
-            value={String(value)}
-            footer={<span className="text-gym-text-muted text-xs">{footer}</span>}
-          />
+          <StatisticsCard key={title} color={color} icon={icon} title={title} value={String(value)} footer={footer} />
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent transactions */}
-        <div className="bg-gym-cream border border-gym-beige-dark rounded-xl p-5 shadow-sm">
-          <Typography variant="h6" className="font-bold text-gym-text-primary mb-4">
-            Recent Transactions
-          </Typography>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5">
+          <h3 className="font-semibold text-gray-900 mb-4 text-sm">Recent Transactions</h3>
           {transactions.slice(0, 5).map((t) => (
-            <div key={t.id} className="flex justify-between items-center border-b border-gym-beige py-2 text-sm">
+            <div key={t.id} className="flex justify-between items-center py-2.5 border-b border-gray-50 last:border-0 text-sm">
               <div>
-                <Typography variant="small" className="font-medium text-gym-text-primary">
-                  {t.memberName || "Member"}
-                </Typography>
-                <Typography variant="small" className="text-gym-text-muted">{t.transactionType}</Typography>
+                <p className="font-medium text-gray-900">{t.member ? `${t.member.firstName} ${t.member.lastName}` : "Member"}</p>
+                <p className="text-xs text-gray-400">{t.transactionType}</p>
               </div>
-              <Typography variant="small" className="font-semibold text-gym-warm">₹{t.amount}</Typography>
+              <span className="font-semibold text-orange-600">{"\u20B9"}{t.amount}</span>
             </div>
           ))}
-          {transactions.length === 0 && (
-            <Typography className="text-gym-text-muted text-sm">No transactions yet.</Typography>
-          )}
+          {transactions.length === 0 && <p className="text-gray-400 text-sm">No transactions yet.</p>}
         </div>
 
-        {/* Trainers list */}
-        <div className="bg-gym-cream border border-gym-beige-dark rounded-xl p-5 shadow-sm">
-          <Typography variant="h6" className="font-bold text-gym-text-primary mb-4">
-            Trainers
-          </Typography>
+        <div className="rounded-2xl border border-gray-100 bg-white p-5">
+          <h3 className="font-semibold text-gray-900 mb-4 text-sm">Trainers</h3>
           {trainers.slice(0, 5).map((t) => (
-            <div key={t.id} className="flex items-center gap-3 border-b border-gym-beige py-2">
-              <div className="w-8 h-8 rounded-full bg-gym-brown flex items-center justify-center text-white text-sm font-bold">
+            <div key={t.id} className="flex items-center gap-3 py-2.5 border-b border-gray-50 last:border-0">
+              <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold">
                 {t.firstName?.[0]}{t.lastName?.[0]}
               </div>
               <div>
-                <Typography variant="small" className="font-medium text-gym-text-primary">
-                  {t.firstName} {t.lastName}
-                </Typography>
-                <Typography variant="small" className="text-gym-text-muted">{t.specialization}</Typography>
+                <p className="text-sm font-medium text-gray-900">{t.firstName} {t.lastName}</p>
+                <p className="text-xs text-gray-400">{t.specialization}</p>
               </div>
             </div>
           ))}
-          {trainers.length === 0 && (
-            <Typography className="text-gym-text-muted text-sm">No trainers yet.</Typography>
-          )}
+          {trainers.length === 0 && <p className="text-gray-400 text-sm">No trainers yet.</p>}
         </div>
       </div>
     </div>

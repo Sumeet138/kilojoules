@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Typography, Button, Input, Alert } from "@material-tailwind/react";
 import { getAllPlans, createMembershipPlan, updateMembershipPlan, deactivateMembershipPlan } from "../../../API/ApiStore";
 
-const PLAN_TYPES = ["MONTHLY", "QUARTERLY", "SEMI_ANNUAL", "ANNUAL", "DAILY", "WEEKLY"];
+const PLAN_TYPES = ["MONTHLY", "QUARTERLY", "ANNUAL"];
 
 const EMPTY_FORM = { planName: "", planType: "MONTHLY", price: "", durationDays: "", description: "" };
 
