@@ -1,6 +1,11 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { Sidenav, DashboardNavbar, Footer } from "../widgets/layout";
 import { useMaterialTailwindController, setOpenSidenav } from "../context";
+import {
+  FiHome, FiCalendar, FiList, FiFeather, FiActivity,
+  FiTrendingUp, FiCreditCard, FiBell, FiUser, FiUsers,
+  FiCheckSquare, FiTag, FiBriefcase, FiGrid, FiLock,
+} from "react-icons/fi";
 
 // Role-specific nav items
 const memberRoutes = [
@@ -8,15 +13,15 @@ const memberRoutes = [
     layout: "dashboard/member",
     title: "Member",
     pages: [
-      { icon: "🏠", name: "Home", path: "/home" },
-      { icon: "📅", name: "Book Classes", path: "/book-classes" },
-      { icon: "📋", name: "My Bookings", path: "/bookings" },
-      { icon: "🥗", name: "Diet Plans", path: "/diet-plans" },
-      { icon: "💪", name: "Workout History", path: "/workouts" },
-      { icon: "⚖️", name: "BMI Tracker", path: "/bmi" },
-      { icon: "💰", name: "Transactions", path: "/transactions" },
-      { icon: "🔔", name: "Notifications", path: "/notifications" },
-      { icon: "👤", name: "Profile", path: "/profile" },
+      { icon: FiHome,       name: "Home",            path: "/home" },
+      { icon: FiCalendar,   name: "Book Classes",    path: "/book-classes" },
+      { icon: FiList,       name: "My Bookings",     path: "/bookings" },
+      { icon: FiFeather,    name: "Diet Plans",      path: "/diet-plans" },
+      { icon: FiActivity,   name: "Workout History", path: "/workouts" },
+      { icon: FiTrendingUp, name: "BMI Tracker",     path: "/bmi" },
+      { icon: FiCreditCard, name: "Transactions",    path: "/transactions" },
+      { icon: FiBell,       name: "Notifications",   path: "/notifications" },
+      { icon: FiUser,       name: "Profile",         path: "/profile" },
     ],
   },
 ];
@@ -26,13 +31,13 @@ const trainerRoutes = [
     layout: "dashboard/trainer",
     title: "Trainer",
     pages: [
-      { icon: "🏠", name: "Home", path: "/home" },
-      { icon: "🏋️", name: "My Classes", path: "/classes" },
-      { icon: "✅", name: "Attendance", path: "/attendance" },
-      { icon: "🥗", name: "Diet Plans", path: "/diet-plans" },
-      { icon: "👥", name: "My Members", path: "/members" },
-      { icon: "🔔", name: "Notifications", path: "/notifications" },
-      { icon: "👤", name: "Profile", path: "/profile" },
+      { icon: FiHome,        name: "Home",          path: "/home" },
+      { icon: FiActivity,    name: "My Classes",    path: "/classes" },
+      { icon: FiCheckSquare, name: "Attendance",    path: "/attendance" },
+      { icon: FiFeather,     name: "Diet Plans",    path: "/diet-plans" },
+      { icon: FiUsers,       name: "My Members",    path: "/members" },
+      { icon: FiBell,        name: "Notifications", path: "/notifications" },
+      { icon: FiUser,        name: "Profile",       path: "/profile" },
     ],
   },
 ];
@@ -42,14 +47,14 @@ const adminRoutes = [
     layout: "dashboard/admin",
     title: "Admin",
     pages: [
-      { icon: "🏠", name: "Home", path: "/home" },
-      { icon: "👥", name: "Members", path: "/members" },
-      { icon: "🏋️", name: "Trainers", path: "/trainers" },
-      { icon: "📅", name: "Fitness Classes", path: "/classes" },
-      { icon: "🎫", name: "Memberships", path: "/memberships" },
-      { icon: "💰", name: "Transactions", path: "/transactions" },
-      { icon: "🔔", name: "Notifications", path: "/notifications" },
-      { icon: "👤", name: "Profile", path: "/profile" },
+      { icon: FiGrid,       name: "Home",            path: "/home" },
+      { icon: FiUsers,      name: "Members",         path: "/members" },
+      { icon: FiBriefcase,  name: "Trainers",        path: "/trainers" },
+      { icon: FiCalendar,   name: "Fitness Classes", path: "/classes" },
+      { icon: FiTag,        name: "Memberships",     path: "/memberships" },
+      { icon: FiCreditCard, name: "Transactions",    path: "/transactions" },
+      { icon: FiBell,       name: "Notifications",   path: "/notifications" },
+      { icon: FiUser,       name: "Profile",         path: "/profile" },
     ],
   },
 ];
@@ -69,11 +74,11 @@ export function Dashboard() {
   const routes = getRoutes(userRole);
 
   return (
-    <div className="min-h-screen bg-gym-beige">
+    <div className="min-h-screen bg-gray-50/80">
       <Sidenav
         routes={routes}
         brandImg="/gym-icon.svg"
-        brandName="GymPro"
+        brandName="Kilojoules"
       />
       <div className="p-4 xl:ml-80">
         <DashboardNavbar />
@@ -82,7 +87,7 @@ export function Dashboard() {
         </main>
         <div className="text-gym-text-muted">
           <Footer
-            brandName="GymPro"
+            brandName="Kilojoules"
             routes={[
               { name: "About", path: "#" },
               { name: "Support", path: "#" },
