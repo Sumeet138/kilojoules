@@ -24,7 +24,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
     >
       <div className={`relative border-b ${sidenavType === "dark" ? "border-gym-warm/30" : "border-gym-beige-dark"}`}>
         <Link to="/" className="flex items-center gap-4 py-6 px-8">
-          <img src={brandImg} alt="GymPro Logo" className="h-8 w-8" />
+          <img src={brandImg} alt="Kilojoules Logo" className="h-8 w-8" />
           <Typography
             variant="h6"
             color={sidenavType === "dark" ? "white" : "inherit"}
@@ -59,7 +59,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
                 </Typography>
               </li>
             )}
-            {pages.map(({ icon, name, path }) => (
+            {pages.map(({ icon: NavIcon, name, path }) => (
               <li key={name}>
                 <NavLink to={`/${layout}${path}`}>
                   {({ isActive }) => (
@@ -74,7 +74,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
                       }`}
                       fullWidth
                     >
-                      <span className="text-lg">{icon}</span>
+                      <NavIcon className="w-5 h-5 flex-shrink-0" />
                       <Typography
                         color="inherit"
                         className="font-medium capitalize text-sm"

@@ -1,4 +1,4 @@
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import {
   Navbar,
   Typography,
@@ -21,9 +21,13 @@ export function DashboardNavbar() {
   const [controller, dispatch] = useMaterialTailwindController();
   const { fixedNavbar, openSidenav } = controller;
   const { pathname } = useLocation();
-  const [layout, page] = pathname.split("/").filter((el) => el !== "");
+  const segments = pathname.split("/").filter((el) => el !== "");
+  const layout = segments[0] || "dashboard";
+  const role = segments[1] || "member";
+  const page = segments[2] || role;
 
   const userRole = localStorage.getItem("userRole") || "member";
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.clear();
@@ -48,7 +52,7 @@ export function DashboardNavbar() {
               fixedNavbar ? "mt-1" : ""
             }`}
           >
-            <Link to={`/${layout}`}>
+            <Link to={`/${layout}/${role}`}>
               <Typography
                 variant="small"
                 color="inherit"
@@ -70,7 +74,7 @@ export function DashboardNavbar() {
           </Typography>
         </div>
         <div className="flex items-center">
-          <div className="mr-auto md:mr-4 md:w-56"></div>
+          <div className="mr-auto md:mr-4"></div>
           <IconButton
             variant="text"
             color="inherit"
@@ -79,7 +83,7 @@ export function DashboardNavbar() {
           >
             <Bars3Icon strokeWidth={3} className="h-6 w-6 text-gym-brown" />
           </IconButton>
-          <Link to={`/${layout}/profile`}>
+          <Link to={`/${layout}/${role}/profile`}>
             <Button
               variant="text"
               className="hidden items-center gap-1 px-4 xl:flex normal-case text-gym-text-primary hover:text-gym-warm"
@@ -88,7 +92,11 @@ export function DashboardNavbar() {
               Profile
             </Button>
           </Link>
-          <IconButton variant="text" className="text-gym-text-primary hover:text-gym-warm">
+          <IconButton
+            variant="text"
+            className="text-gym-text-primary hover:text-gym-warm"
+            onClick={() => navigate(`/${layout}/${role}/notifications`)}
+          >
             <BellIcon className="h-5 w-5 text-gym-warm" />
           </IconButton>
           <Button

@@ -1,6 +1,8 @@
 import { Typography } from "@material-tailwind/react";
+import { Link } from "react-router-dom";
+import { FiMap } from "react-icons/fi";
 
-export function Footer({ brandName = "GymPro", brandLink = "/", routes = [] }) {
+export function Footer({ brandName = "Kilojoules", brandLink = "/", routes = [] }) {
   const year = new Date().getFullYear();
 
   return (
@@ -32,6 +34,14 @@ export function Footer({ brandName = "GymPro", brandLink = "/", routes = [] }) {
               </Typography>
             </li>
           ))}
+          <li>
+            <Link
+              to="/system-design"
+              className="text-xs font-medium text-gym-text-muted hover:text-gym-warm transition-colors flex items-center gap-1"
+            >
+              <FiMap className="w-3.5 h-3.5" /> System Design
+            </Link>
+          </li>
         </ul>
       </div>
     </footer>
