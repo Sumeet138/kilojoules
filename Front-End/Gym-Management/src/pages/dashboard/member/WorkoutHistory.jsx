@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Typography, Button, Input, Alert } from "@material-tailwind/react";
 import { fetchWorkouts } from "../../../store/slices/workoutHistorySlice";
 import { logWorkout } from "../../../API/ApiStore";
+import { FiActivity } from "react-icons/fi";
 
 export default function WorkoutHistory() {
   const dispatch = useDispatch();
@@ -112,7 +113,7 @@ export default function WorkoutHistory() {
         </div>
       ) : workouts.length === 0 ? (
         <div className="text-center py-20 text-gym-text-muted">
-          <span className="text-5xl block mb-3">💪</span>
+          <FiActivity className="w-10 h-10 mx-auto mb-3 text-gray-300" />
           No workouts logged yet.
         </div>
       ) : (

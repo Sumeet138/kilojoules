@@ -12,7 +12,7 @@ export function StatisticsChart({ chart, title, description, footer }) {
         className="flex flex-col gap-1 rounded-none md:flex-row md:items-center"
       >
         <div className="w-max rounded-lg bg-gradient-to-br from-gym-warm to-gym-warm-dark p-2 text-white">
-          <span className="text-xl">{chart.icon || "📊"}</span>
+          <span className="text-xl">{chart.icon || "—"}</span>
         </div>
         <div>
           <Typography variant="h6" className="font-bold text-gym-text-primary">

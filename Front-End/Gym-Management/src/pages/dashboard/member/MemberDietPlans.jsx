@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Typography } from "@material-tailwind/react";
 import { fetchDietPlans } from "../../../store/slices/dietPlanSlice";
+import { FiFeather } from "react-icons/fi";
 
 export default function MemberDietPlans() {
   const dispatch = useDispatch();
@@ -27,7 +28,7 @@ export default function MemberDietPlans() {
         </div>
       ) : plans.length === 0 ? (
         <div className="text-center py-20 text-gym-text-muted">
-          <span className="text-5xl block mb-3">🥗</span>
+          <FiFeather className="w-10 h-10 mx-auto mb-3 text-gray-300" />
           No diet plans assigned yet.
         </div>
       ) : (

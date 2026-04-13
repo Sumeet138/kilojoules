@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Typography } from "@material-tailwind/react";
 import { fetchMemberBookings } from "../../../store/slices/classBookingSlice";
+import { FiCalendar } from "react-icons/fi";
 
 const STATUS_STYLES = {
   BOOKED: "bg-blue-100 text-blue-700",
@@ -34,7 +35,7 @@ export default function MyBookings() {
         </div>
       ) : bookings.length === 0 ? (
         <div className="text-center py-20 text-gym-text-muted">
-          <span className="text-5xl block mb-3">📋</span>
+          <FiCalendar className="w-10 h-10 mx-auto mb-3 text-gray-300" />
           No bookings yet. Go book a class!
         </div>
       ) : (

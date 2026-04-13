@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Typography, Button, Chip, Alert } from "@material-tailwind/react";
 import { fetchFitnessClasses } from "../../../store/slices/fitnessClassSlice";
 import { bookClassThunk } from "../../../store/slices/classBookingSlice";
+import { FiCalendar, FiClock } from "react-icons/fi";
 
 const CLASS_COLORS = {
   YOGA: "bg-purple-100 text-purple-700",
@@ -98,10 +99,9 @@ export default function BookClasses() {
                   Trainer: {fc.trainer ? `${fc.trainer.firstName} ${fc.trainer.lastName}` : "TBA"}
                 </Typography>
 
-                <div className="flex flex-col gap-1 text-sm text-gym-text-secondary mb-4">
-                  <span>📅 {fc.scheduledDay}</span>
-                  <span>⏰ {fc.scheduledTime}</span>
-                  <span>⏱ {fc.durationMinutes} min</span>
+                <div className="flex flex-col gap-1.5 text-sm text-gray-500 mb-4">
+                  <span className="flex items-center gap-1.5"><FiCalendar className="w-3.5 h-3.5" /> {fc.scheduledDay}</span>
+                  <span className="flex items-center gap-1.5"><FiClock className="w-3.5 h-3.5" /> {fc.scheduledTime} · {fc.durationMinutes} min</span>
                 </div>
 
                 <Button

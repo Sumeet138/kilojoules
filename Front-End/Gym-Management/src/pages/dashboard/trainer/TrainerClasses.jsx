@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Typography } from "@material-tailwind/react";
 import { fetchTrainerClasses } from "../../../store/slices/fitnessClassSlice";
+import { FiCalendar } from "react-icons/fi";
 
 export default function TrainerClasses() {
   const dispatch = useDispatch();
@@ -27,7 +28,7 @@ export default function TrainerClasses() {
         </div>
       ) : trainerClasses.length === 0 ? (
         <div className="text-center py-20 text-gym-text-muted">
-          <span className="text-5xl block mb-3">🏋️</span>
+          <FiCalendar className="w-10 h-10 mx-auto mb-3 text-gray-300" />
           No classes assigned yet.
         </div>
       ) : (

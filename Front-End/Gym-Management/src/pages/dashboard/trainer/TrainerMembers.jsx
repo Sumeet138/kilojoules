@@ -1,9 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Typography } from "@material-tailwind/react";
 import { fetchAllTrainers } from "../../../store/slices/trainerSlice";
 import { getAllMembers } from "../../../API/ApiStore";
-import { useState } from "react";
+import { FiMail, FiPhone, FiTarget } from "react-icons/fi";
 
 export default function TrainerMembers() {
   const [members, setMembers] = useState([]);
@@ -62,9 +62,9 @@ export default function TrainerMembers() {
                 </div>
               </div>
               <div className="flex flex-col gap-1 text-sm text-gym-text-secondary">
-                <span>📧 {m.email}</span>
-                {m.phone && <span>📞 {m.phone}</span>}
-                {m.fitnessGoals && <span>🎯 {m.fitnessGoals}</span>}
+                <span className="flex items-center gap-1.5"><FiMail className="w-3.5 h-3.5" /> {m.email}</span>
+                {m.phone && <span className="flex items-center gap-1.5"><FiPhone className="w-3.5 h-3.5" /> {m.phone}</span>}
+                {m.fitnessGoals && <span className="flex items-center gap-1.5"><FiTarget className="w-3.5 h-3.5" /> {m.fitnessGoals}</span>}
               </div>
             </div>
           ))}

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Typography, Button, Input, Alert } from "@material-tailwind/react";
 import { fetchNotifications } from "../../../store/slices/notificationSlice";
 import { createNotification, deleteNotification } from "../../../API/ApiStore";
+import { FiBell } from "react-icons/fi";
 
 const RECIPIENT_TYPES = ["ALL", "MEMBER", "TRAINER", "ADMIN"];
 
@@ -110,7 +111,7 @@ export default function AdminNotifications() {
         </div>
       ) : notifications.length === 0 ? (
         <div className="text-center py-20 text-gym-text-muted">
-          <span className="text-5xl block mb-3">🔔</span>
+          <FiBell className="w-10 h-10 mx-auto mb-3 text-gray-300" />
           No notifications sent yet.
         </div>
       ) : (

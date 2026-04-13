@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Typography } from "@material-tailwind/react";
 import { fetchMemberTransactions } from "../../../store/slices/transactionSlice";
+import { FiDollarSign } from "react-icons/fi";
 
 const STATUS_STYLES = {
   COMPLETED: "bg-green-100 text-green-700",
@@ -32,7 +33,7 @@ export default function MemberTransactions() {
 
       {/* Summary card */}
       <div className="bg-gym-cream border border-gym-beige-dark rounded-xl p-5 shadow-sm mb-6 inline-flex items-center gap-4">
-        <span className="text-3xl">💰</span>
+        <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><FiDollarSign className="w-5 h-5" /></div>
         <div>
           <Typography variant="small" className="text-gym-text-muted">Total Spent</Typography>
           <Typography variant="h4" className="font-bold text-gym-warm">₹{total}</Typography>
@@ -45,7 +46,7 @@ export default function MemberTransactions() {
         </div>
       ) : transactions.length === 0 ? (
         <div className="text-center py-20 text-gym-text-muted">
-          <span className="text-5xl block mb-3">🧾</span>
+          <FiDollarSign className="w-10 h-10 mx-auto mb-3 text-gray-300" />
           No transactions yet.
         </div>
       ) : (

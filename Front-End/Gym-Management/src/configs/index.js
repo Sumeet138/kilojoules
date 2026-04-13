@@ -1,14 +1,14 @@
 export const API_BASE_URL = "http://localhost:8080/api";
 
 export const CLASS_TYPES = [
-  { value: "YOGA", label: "Yoga", icon: "🧘", color: "text-purple-600" },
-  { value: "HIIT", label: "HIIT", icon: "⚡", color: "text-red-600" },
-  { value: "ZUMBA", label: "Zumba", icon: "💃", color: "text-pink-600" },
-  { value: "CROSSFIT", label: "CrossFit", icon: "🏋️", color: "text-blue-600" },
-  { value: "PILATES", label: "Pilates", icon: "🤸", color: "text-green-600" },
-  { value: "SPINNING", label: "Spinning", icon: "🚴", color: "text-yellow-600" },
-  { value: "BOXING", label: "Boxing", icon: "🥊", color: "text-orange-600" },
-  { value: "STRENGTH", label: "Strength", icon: "💪", color: "text-gym-brown" },
+  { value: "YOGA", label: "Yoga", color: "text-purple-600" },
+  { value: "HIIT", label: "HIIT", color: "text-red-600" },
+  { value: "ZUMBA", label: "Zumba", color: "text-pink-600" },
+  { value: "CROSSFIT", label: "CrossFit", color: "text-blue-600" },
+  { value: "PILATES", label: "Pilates", color: "text-green-600" },
+  { value: "SPINNING", label: "Spinning", color: "text-yellow-600" },
+  { value: "BOXING", label: "Boxing", color: "text-orange-600" },
+  { value: "STRENGTH", label: "Strength", color: "text-amber-700" },
 ];
 
 export const BMI_CATEGORIES = {

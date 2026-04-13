@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Typography } from "@material-tailwind/react";
 import { fetchNotifications } from "../../../store/slices/notificationSlice";
+import { markNotificationRead } from "../../../API/ApiStore";
+import { FiBell } from "react-icons/fi";
 
 export default function TrainerNotifications() {
   const dispatch = useDispatch();
@@ -10,6 +12,14 @@ export default function TrainerNotifications() {
   useEffect(() => {
     dispatch(fetchNotifications("TRAINER"));
   }, [dispatch]);
+
+  const handleMarkRead = async (n) => {
+    if (n.isRead) return;
+    try {
+      await markNotificationRead(n.id);
+      dispatch(fetchNotifications("TRAINER"));
+    } catch {}
+  };
 
   return (
     <div className="mt-4">
@@ -26,7 +36,7 @@ export default function TrainerNotifications() {
         </div>
       ) : notifications.length === 0 ? (
         <div className="text-center py-20 text-gym-text-muted">
-          <span className="text-5xl block mb-3">🔔</span>
+          <FiBell className="w-10 h-10 mx-auto mb-3 text-gray-300" />
           No notifications.
         </div>
       ) : (
@@ -34,7 +44,8 @@ export default function TrainerNotifications() {
           {notifications.map((n) => (
             <div
               key={n.id}
-              className={`bg-gym-cream border rounded-xl p-4 shadow-sm ${n.isRead ? "border-gym-beige-dark" : "border-gym-brown"}`}
+              onClick={() => handleMarkRead(n)}
+              className={`bg-gym-cream border rounded-xl p-4 shadow-sm transition-all ${n.isRead ? "border-gym-beige-dark opacity-75" : "border-gym-brown cursor-pointer hover:shadow-md"}`}
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
