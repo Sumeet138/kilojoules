@@ -14,7 +14,7 @@ public class EmailService {
     public void sendOtpEmail(String to, String otp) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("GymPro - Password Reset OTP");
+        message.setSubject("Kilojoules - Password Reset OTP");
         message.setText("Your OTP for password reset is: " + otp +
                 "\n\nThis OTP is valid for 10 minutes.\n\nIf you did not request this, please ignore this email.");
         mailSender.send(message);
@@ -23,8 +23,8 @@ public class EmailService {
     public void sendWelcomeEmail(String to, String name) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Welcome to GymPro!");
-        message.setText("Hello " + name + ",\n\nWelcome to GymPro Fitness Center Management System!\n" +
+        message.setSubject("Welcome to Kilojoules!");
+        message.setText("Hello " + name + ",\n\nWelcome to Kilojoules Energy & Fitness Management System!\n" +
                 "Your account has been created successfully.\n\nLet's crush your fitness goals!");
         mailSender.send(message);
     }

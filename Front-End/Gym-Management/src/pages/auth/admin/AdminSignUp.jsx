@@ -1,7 +1,28 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { Card, CardBody, Typography, Input, Button, Alert } from "@material-tailwind/react";
-import { registerAdmin } from "../../../API/ApiStore";
+import { registerAdminThunk } from "../../../store/slices/adminSlice";
+import { FiShield } from "react-icons/fi";
+import { AdminAutoFillButton } from "../../../components/TestAutoFillButton";
+
+const InputField = ({ label, name, type = "text", placeholder, value, onChange, required = true }) => (
+  <div>
+    <label className="text-xs font-medium text-gray-500 mb-1.5 block">
+      {label}{required && <span className="text-red-400"> *</span>}
+    </label>
+    <Input
+      type={type}
+      name={name}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      required={required}
+      className="!border-gray-200 focus:!border-orange-400 bg-white"
+      labelProps={{ className: "hidden" }}
+    />
+  </div>
+);
 
 export function AdminSignUp() {
   const navigate = useNavigate();
@@ -19,6 +40,10 @@ export function AdminSignUp() {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
+  const handleAutoFill = (testData) => {
+    setForm(testData);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -35,73 +60,53 @@ export function AdminSignUp() {
     }
   };
 
-  const InputField = ({ label, name, type = "text", placeholder }) => (
-    <div>
-      <Typography variant="small" className="font-medium text-gym-text-primary mb-1">
-        {label} <span className="text-red-500">*</span>
-      </Typography>
-      <Input
-        type={type}
-        name={name}
-        placeholder={placeholder}
-        value={form[name]}
-        onChange={handleChange}
-        required
-        className="!border-gym-beige-dark focus:!border-gym-warm bg-white"
-        labelProps={{ className: "hidden" }}
-      />
-    </div>
-  );
-
   return (
-    <div className="flex justify-center py-4">
-      <Card className="w-full max-w-lg border border-gym-beige-dark bg-gym-cream shadow-xl">
-        <CardBody className="p-8">
-          <div className="text-center mb-8">
-            <span className="text-4xl">👑</span>
-            <Typography variant="h4" className="font-bold text-gym-text-primary mt-2">
-              Admin Registration
-            </Typography>
-            <Typography variant="small" className="text-gym-text-muted mt-1">
-              Create an admin account
-            </Typography>
-          </div>
+    <div className="flex flex-col gap-6 py-2">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-600">
+          <FiShield className="h-5 w-5" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 leading-tight">Admin Registration</h2>
+          <p className="text-xs text-gray-400">Create an admin account</p>
+        </div>
+      </div>
 
-          {error && (
-            <Alert color="red" className="mb-4 text-sm">{error}</Alert>
-          )}
+      {error && <Alert color="red" className="text-sm">{error}</Alert>}
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
-              <InputField label="Admin ID" name="adminId" placeholder="e.g. ADM001" />
-            </div>
-            <InputField label="Username" name="username" placeholder="Choose a username" />
-            <InputField label="Password" name="password" type="password" placeholder="Min 8 characters" />
-            <InputField label="Email" name="email" type="email" placeholder="admin@gym.com" />
-            <InputField label="Phone" name="phone" placeholder="9876543210" />
-            <InputField label="First Name" name="firstName" placeholder="John" />
-            <InputField label="Last Name" name="lastName" placeholder="Doe" />
+      <div className="flex justify-end">
+        <AdminAutoFillButton onFill={handleAutoFill} />
+      </div>
 
-            <div className="md:col-span-2">
-              <Button
-                type="submit"
-                loading={loading}
-                fullWidth
-                className="bg-gradient-to-r from-gym-charcoal to-gym-brown text-white shadow-md"
-              >
-                {loading ? "Registering..." : "Create Admin Account"}
-              </Button>
-            </div>
-          </form>
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="md:col-span-2">
+          <InputField label="Admin ID" name="adminId" placeholder="e.g. ADM001" value={form.adminId} onChange={handleChange} />
+        </div>
+        <InputField label="Username" name="username" placeholder="Choose a username" value={form.username} onChange={handleChange} />
+        <InputField label="Password" name="password" type="password" placeholder="Min 8 characters" value={form.password} onChange={handleChange} />
+        <InputField label="Email" name="email" type="email" placeholder="admin@gym.com" value={form.email} onChange={handleChange} />
+        <InputField label="Phone" name="phone" placeholder="9876543210" value={form.phone} onChange={handleChange} />
+        <InputField label="First Name" name="firstName" placeholder="John" value={form.firstName} onChange={handleChange} />
+        <InputField label="Last Name" name="lastName" placeholder="Doe" value={form.lastName} onChange={handleChange} />
 
-          <Typography variant="small" className="text-center text-gym-text-muted mt-6">
-            Already have an account?{" "}
-            <Link to="/auth/admin/sign-in" className="font-semibold text-gym-charcoal hover:underline">
-              Sign in
-            </Link>
-          </Typography>
-        </CardBody>
-      </Card>
+        <div className="md:col-span-2">
+          <Button
+            type="submit"
+            loading={loading}
+            fullWidth
+            className="bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md rounded-xl"
+          >
+            {loading ? "Registering..." : "Create Admin Account"}
+          </Button>
+        </div>
+      </form>
+
+      <p className="text-sm text-gray-400 text-center">
+        Already have an account?{" "}
+        <Link to="/auth/admin/sign-in" className="font-semibold text-orange-600 hover:underline">
+          Sign in
+        </Link>
+      </p>
     </div>
   );
 }

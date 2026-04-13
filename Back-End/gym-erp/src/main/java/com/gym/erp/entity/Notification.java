@@ -1,5 +1,6 @@
 package com.gym.erp.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gym.erp.entity.enums.RecipientType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,7 @@ public class Notification {
     @Column(nullable = false, length = 20)
     private RecipientType recipientType;
 
+    @JsonProperty("isRead")
     @Column(nullable = false)
     private boolean isRead = false;
 

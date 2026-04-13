@@ -1,7 +1,27 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Card, CardBody, Typography, Input, Button, Select, Option, Textarea, Alert } from "@material-tailwind/react";
+import { Card, CardBody, Typography, Input, Button, Textarea, Alert } from "@material-tailwind/react";
 import { registerMember } from "../../../API/ApiStore";
+import { MemberAutoFillButton } from "../../../components/TestAutoFillButton";
+import { FiUser } from "react-icons/fi";
+
+const InputField = ({ label, name, type = "text", placeholder, value, onChange, required = true }) => (
+  <div>
+    <label className="text-xs font-medium text-gray-500 mb-1.5 block">
+      {label}{required && <span className="text-red-400"> *</span>}
+    </label>
+    <Input
+      type={type}
+      name={name}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      required={required}
+      className="!border-gray-200 focus:!border-orange-400 bg-white"
+      labelProps={{ className: "hidden" }}
+    />
+  </div>
+);
 
 export function MemberSignUp() {
   const navigate = useNavigate();
@@ -28,6 +48,10 @@ export function MemberSignUp() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
+  const handleAutoFill = (testData) => {
+    setForm(testData);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -44,136 +68,110 @@ export function MemberSignUp() {
     }
   };
 
-  const InputField = ({ label, name, type = "text", placeholder, required = true }) => (
-    <div>
-      <Typography variant="small" className="font-medium text-gym-text-primary mb-1">
-        {label}{required && <span className="text-red-500"> *</span>}
-      </Typography>
-      <Input
-        type={type}
-        name={name}
-        placeholder={placeholder}
-        value={form[name]}
-        onChange={handleChange}
-        required={required}
-        className="!border-gym-beige-dark focus:!border-gym-warm bg-white"
-        labelProps={{ className: "hidden" }}
-      />
-    </div>
-  );
-
   return (
-    <div className="flex justify-center py-4">
-      <Card className="w-full max-w-2xl border border-gym-beige-dark bg-gym-cream shadow-xl">
-        <CardBody className="p-8">
-          <div className="text-center mb-8">
-            <span className="text-4xl">🏃</span>
-            <Typography variant="h4" className="font-bold text-gym-text-primary mt-2">
-              Member Registration
-            </Typography>
-            <Typography variant="small" className="text-gym-text-muted mt-1">
-              Start your fitness journey today
-            </Typography>
-          </div>
+    <div className="flex flex-col gap-6 py-2 max-h-[85vh] overflow-y-auto pr-1">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+          <FiUser className="h-5 w-5" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 leading-tight">Member Registration</h2>
+          <p className="text-xs text-gray-400">Start your fitness journey today</p>
+        </div>
+      </div>
 
-          {error && (
-            <Alert color="red" className="mb-4 text-sm">{error}</Alert>
-          )}
+      {error && <Alert color="red" className="text-sm">{error}</Alert>}
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InputField label="Member ID" name="memberId" placeholder="e.g. MEM001" />
-            <InputField label="Username" name="username" placeholder="Choose a username" />
-            <InputField label="Email" name="email" type="email" placeholder="your@email.com" />
-            <InputField label="Password" name="password" type="password" placeholder="Min 8 characters" />
-            <InputField label="First Name" name="firstName" placeholder="John" />
-            <InputField label="Last Name" name="lastName" placeholder="Doe" />
-            <InputField label="Phone" name="phone" placeholder="9876543210" />
-            <InputField label="Date of Birth" name="dob" type="date" />
-            <InputField label="Age" name="age" type="number" placeholder="25" />
+      <div className="flex justify-end">
+        <MemberAutoFillButton onFill={handleAutoFill} />
+      </div>
 
-            <div>
-              <Typography variant="small" className="font-medium text-gym-text-primary mb-1">
-                Gender <span className="text-red-500">*</span>
-              </Typography>
-              <select
-                name="gender"
-                value={form.gender}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-gym-beige-dark bg-white px-3 py-2 text-gym-text-primary focus:border-gym-warm focus:outline-none"
-              >
-                <option value="MALE">Male</option>
-                <option value="FEMALE">Female</option>
-                <option value="OTHER">Other</option>
-              </select>
-            </div>
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <InputField label="Member ID" name="memberId" placeholder="e.g. MEM001" value={form.memberId} onChange={handleChange} />
+        <InputField label="Username" name="username" placeholder="Choose a username" value={form.username} onChange={handleChange} />
+        <InputField label="Email" name="email" type="email" placeholder="your@email.com" value={form.email} onChange={handleChange} />
+        <InputField label="Password" name="password" type="password" placeholder="Min 8 characters" value={form.password} onChange={handleChange} />
+        <InputField label="First Name" name="firstName" placeholder="John" value={form.firstName} onChange={handleChange} />
+        <InputField label="Last Name" name="lastName" placeholder="Doe" value={form.lastName} onChange={handleChange} />
+        <InputField label="Phone" name="phone" placeholder="9876543210" value={form.phone} onChange={handleChange} />
+        <InputField label="Date of Birth" name="dob" type="date" value={form.dob} onChange={handleChange} />
+        <InputField label="Age" name="age" type="number" placeholder="25" value={form.age} onChange={handleChange} />
 
-            <InputField label="Height (cm)" name="heightCm" type="number" placeholder="175" />
-            <InputField label="Weight (kg)" name="weightKg" type="number" placeholder="70" />
+        <div>
+          <label className="text-xs font-medium text-gray-500 mb-1.5 block">
+            Gender <span className="text-red-400">*</span>
+          </label>
+          <select
+            name="gender"
+            value={form.gender}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:border-orange-400 focus:outline-none"
+          >
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
 
-            <div className="md:col-span-2">
-              <Typography variant="small" className="font-medium text-gym-text-primary mb-1">
-                Health Conditions
-              </Typography>
-              <Textarea
-                name="healthConditions"
-                placeholder="Any existing health conditions, injuries, or medical notes..."
-                value={form.healthConditions}
-                onChange={handleChange}
-                className="!border-gym-beige-dark focus:!border-gym-warm bg-white"
-                labelProps={{ className: "hidden" }}
-                rows={2}
-              />
-            </div>
+        <InputField label="Height (cm)" name="heightCm" type="number" placeholder="175" value={form.heightCm} onChange={handleChange} />
+        <InputField label="Weight (kg)" name="weightKg" type="number" placeholder="70" value={form.weightKg} onChange={handleChange} />
 
-            <div className="md:col-span-2">
-              <Typography variant="small" className="font-medium text-gym-text-primary mb-1">
-                Fitness Goals
-              </Typography>
-              <Textarea
-                name="fitnessGoals"
-                placeholder="e.g. Weight loss, muscle gain, improve stamina..."
-                value={form.fitnessGoals}
-                onChange={handleChange}
-                className="!border-gym-beige-dark focus:!border-gym-warm bg-white"
-                labelProps={{ className: "hidden" }}
-                rows={2}
-              />
-            </div>
+        <div className="md:col-span-2">
+          <label className="text-xs font-medium text-gray-500 mb-1.5 block">Health Conditions</label>
+          <Textarea
+            name="healthConditions"
+            placeholder="Any existing health conditions, injuries, or medical notes..."
+            value={form.healthConditions}
+            onChange={handleChange}
+            className="!border-gray-200 focus:!border-orange-400 bg-white"
+            labelProps={{ className: "hidden" }}
+            rows={2}
+          />
+        </div>
 
-            <div className="md:col-span-2">
-              <Typography variant="small" className="font-medium text-gym-text-primary mb-1">
-                Trainer Preference
-              </Typography>
-              <Input
-                name="trainerPreference"
-                placeholder="e.g. Female trainer, HIIT specialist, experienced..."
-                value={form.trainerPreference}
-                onChange={handleChange}
-                className="!border-gym-beige-dark focus:!border-gym-warm bg-white"
-                labelProps={{ className: "hidden" }}
-              />
-            </div>
+        <div className="md:col-span-2">
+          <label className="text-xs font-medium text-gray-500 mb-1.5 block">Fitness Goals</label>
+          <Textarea
+            name="fitnessGoals"
+            placeholder="e.g. Weight loss, muscle gain, improve stamina..."
+            value={form.fitnessGoals}
+            onChange={handleChange}
+            className="!border-gray-200 focus:!border-orange-400 bg-white"
+            labelProps={{ className: "hidden" }}
+            rows={2}
+          />
+        </div>
 
-            <div className="md:col-span-2">
-              <Button
-                type="submit"
-                loading={loading}
-                fullWidth
-                className="bg-gradient-to-r from-gym-warm to-gym-warm-dark text-white shadow-md"
-              >
-                {loading ? "Registering..." : "Create Account"}
-              </Button>
-            </div>
-          </form>
+        <div className="md:col-span-2">
+          <label className="text-xs font-medium text-gray-500 mb-1.5 block">Trainer Preference</label>
+          <Input
+            name="trainerPreference"
+            placeholder="e.g. Female trainer, HIIT specialist, experienced..."
+            value={form.trainerPreference}
+            onChange={handleChange}
+            className="!border-gray-200 focus:!border-orange-400 bg-white"
+            labelProps={{ className: "hidden" }}
+          />
+        </div>
 
-          <Typography variant="small" className="text-center text-gym-text-muted mt-6">
-            Already have an account?{" "}
-            <Link to="/auth/member/sign-in" className="font-semibold text-gym-warm hover:underline">
-              Sign in
-            </Link>
-          </Typography>
-        </CardBody>
-      </Card>
+        <div className="md:col-span-2">
+          <Button
+            type="submit"
+            loading={loading}
+            fullWidth
+            className="bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md rounded-xl"
+          >
+            {loading ? "Registering..." : "Create Account"}
+          </Button>
+        </div>
+      </form>
+
+      <p className="text-sm text-gray-400 text-center">
+        Already have an account?{" "}
+        <Link to="/auth/member/sign-in" className="font-semibold text-orange-600 hover:underline">
+          Sign in
+        </Link>
+      </p>
     </div>
   );
 }

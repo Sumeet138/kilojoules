@@ -31,6 +31,7 @@ const AdminSignIn = lazy(() =>
 const AdminSignUp = lazy(() =>
   import("./pages/auth/admin/AdminSignUp").then((m) => ({ default: m.AdminSignUp }))
 );
+const SystemDesign = lazy(() => import("./pages/SystemDesign"));
 
 // ---- Lazy member dashboard ----
 const MemberHome = lazy(() => import("./pages/dashboard/member/MemberHome"));
@@ -142,6 +143,9 @@ export const routes = [
       { path: "profile", element: S(AdminProfile) },
     ],
   },
+
+  // ---- System Design ----
+  { path: "/system-design", element: S(SystemDesign) },
 
   // ---- Fallback ----
   { path: "*", element: <Navigate to="/auth" replace /> },
