@@ -1,675 +1,575 @@
-import { useState } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import {
-  FiMonitor, FiServer, FiDatabase, FiArrowDown, FiArrowRight,
-  FiPackage, FiCpu, FiGrid,
-  FiLock, FiCalendar, FiCheckSquare, FiActivity, FiTrendingUp,
-  FiFeather, FiCreditCard, FiBell, FiUser, FiUsers,
-  FiTag, FiShield, FiKey, FiLink, FiStar, FiList,
-  FiSettings, FiCheckCircle, FiBriefcase, FiLayers, FiCode,
-  FiGitBranch, FiAlertCircle, FiBox, FiZap, FiMaximize2,
-} from "react-icons/fi";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// DATA
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-function Chip({ children, color = "gray" }) {
-  const map = {
-    gray:   "bg-white border border-gray-200 text-gray-600",
-    amber:  "bg-amber-50 border border-amber-200 text-amber-800",
-    green:  "bg-emerald-50 border border-emerald-200 text-emerald-800",
-    rose:   "bg-rose-50 border border-rose-200 text-rose-800",
-    blue:   "bg-blue-50 border border-blue-200 text-blue-800",
-    purple: "bg-purple-50 border border-purple-200 text-purple-800",
-    orange: "bg-orange-50 border border-orange-200 text-orange-800",
-  };
-  return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium ${map[color]}`}>
-      {children}
-    </span>
-  );
-}
-
-function Badge({ children, color = "gray" }) {
-  const map = {
-    green:  "bg-emerald-100 text-emerald-700",
-    red:    "bg-red-100 text-red-600",
-    amber:  "bg-amber-100 text-amber-700",
-    blue:   "bg-blue-100 text-blue-700",
-    gray:   "bg-gray-100 text-gray-600",
-  };
-  return (
-    <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wide ${map[color]}`}>
-      {children}
-    </span>
-  );
-}
-
-
-function SectionTitle({ icon: Icon, title, sub }) {
-  return (
-    <div className="mb-6">
-      <div className="flex items-center gap-2 mb-1">
-        <Icon className="text-amber-600 w-5 h-5" />
-        <h2 className="text-xl font-bold text-gray-900">{title}</h2>
-      </div>
-      {sub && <p className="text-gray-400 text-xs ml-7">{sub}</p>}
-    </div>
-  );
-}
-
-// ─── TOC ─────────────────────────────────────────────────────────────────────
-
-const SECTIONS = [
+const TOC = [
   { id: "overview",    label: "Overview" },
-  { id: "arch",        label: "Architecture" },
+  { id: "architecture",label: "Architecture" },
   { id: "rbac",        label: "RBAC" },
-  { id: "authflow",    label: "Auth Flow" },
+  { id: "auth-flow",   label: "Auth Flow" },
   { id: "frontend",    label: "Frontend" },
   { id: "backend",     label: "Backend" },
-  { id: "schema",      label: "DB Schema" },
+  { id: "database",    label: "Database" },
   { id: "api",         label: "API Reference" },
   { id: "stack",       label: "Tech Stack" },
 ];
 
-// ─── 1. Overview ─────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// SMALL HELPERS
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-function Overview() {
-  const stats = [
-    { label: "User Roles",        value: "3",   note: "Member · Trainer · Admin",         color: "amber" },
-    { label: "REST Endpoints",    value: "40+", note: "Across 12 controllers",             color: "blue" },
-    { label: "DB Tables",         value: "12",  note: "Fully relational MySQL schema",     color: "purple" },
-    { label: "Frontend Pages",    value: "24+", note: "Lazy-loaded React components",      color: "green" },
-    { label: "Redux Slices",      value: "11",  note: "Per-feature state management",      color: "orange" },
-    { label: "Route Guards",      value: "2",   note: "ProtectedRoute · GuestRoute",       color: "rose" },
-  ];
-  const colors = {
-    amber:  "bg-amber-50 border-amber-200 text-amber-700",
-    blue:   "bg-blue-50 border-blue-200 text-blue-700",
-    purple: "bg-purple-50 border-purple-200 text-purple-700",
-    green:  "bg-emerald-50 border-emerald-200 text-emerald-700",
-    orange: "bg-orange-50 border-orange-200 text-orange-700",
-    rose:   "bg-rose-50 border-rose-200 text-rose-700",
+function Tag({ children, color = "gray" }) {
+  const c = {
+    gray:   "bg-gray-100 text-gray-600",
+    blue:   "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
+    green:  "bg-green-50 text-green-700 ring-1 ring-green-200",
+    amber:  "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
+    red:    "bg-red-50 text-red-600 ring-1 ring-red-200",
+    purple: "bg-purple-50 text-purple-700 ring-1 ring-purple-200",
+    rose:   "bg-rose-50 text-rose-700 ring-1 ring-rose-200",
   };
+  return <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-semibold font-mono ${c[color]}`}>{children}</span>;
+}
+
+function H2({ id, children }) {
   return (
-    <section id="overview" className="mb-14 scroll-mt-16">
-      <SectionTitle icon={FiZap} title="Project Overview" sub="Kilojoules — Full-stack Gym Management System" />
-      <p className="text-gray-500 text-sm leading-relaxed mb-6 max-w-3xl">
-        A three-tier web application connecting gym members, trainers, and admins. The React SPA communicates with a
-        Spring Boot REST API which persists data in a MySQL relational database. Role-based access control restricts
-        every frontend route and conceptually every API endpoint based on the authenticated user's role.
+    <h2 id={id} className="scroll-mt-20 text-2xl font-bold text-gray-900 mb-1 mt-14 first:mt-0 flex items-center gap-3">
+      <span className="w-1 h-6 rounded-full bg-orange-400 flex-shrink-0" />
+      {children}
+    </h2>
+  );
+}
+
+function H3({ children }) {
+  return <h3 className="text-base font-semibold text-gray-800 mt-8 mb-3">{children}</h3>;
+}
+
+function P({ children }) {
+  return <p className="text-sm text-gray-500 leading-relaxed mb-4">{children}</p>;
+}
+
+function Divider() {
+  return <hr className="my-10 border-gray-100" />;
+}
+
+function Code({ children }) {
+  return <code className="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded text-[12px] font-mono">{children}</code>;
+}
+
+function DarkBlock({ children }) {
+  return (
+    <div className="bg-gray-950 rounded-xl p-4 font-mono text-[12px] leading-relaxed overflow-x-auto mb-4">
+      {children}
+    </div>
+  );
+}
+
+function Table({ head, rows, className = "" }) {
+  return (
+    <div className={`overflow-x-auto rounded-xl border border-gray-200 mb-6 ${className}`}>
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-gray-50 border-b border-gray-200">
+            {head.map((h, i) => (
+              <th key={i} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          {rows.map((row, i) => (
+            <tr key={i} className="hover:bg-gray-50 transition-colors">
+              {row.map((cell, j) => (
+                <td key={j} className="px-4 py-3 text-sm text-gray-700">{cell}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function Check({ yes }) {
+  return yes
+    ? <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-600 text-[11px] font-bold">âœ“</span>
+    : <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-300 text-[11px]">â€“</span>;
+}
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// SECTIONS
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+function SectionOverview() {
+  return (
+    <section>
+      <H2 id="overview">Overview</H2>
+      <p className="text-sm text-gray-500 leading-relaxed mb-6">
+        <strong className="text-gray-800">Kilojoules</strong> is a full-stack gym management system that connects three user roles â€” Members, Trainers, and Admins â€” through a React SPA, a Spring Boot REST API, and a MySQL relational database.
       </p>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {stats.map(({ label, value, note, color }) => (
-          <div key={label} className={`rounded-xl border p-4 ${colors[color]}`}>
-            <div className="text-2xl font-extrabold">{value}</div>
-            <div className="text-xs font-semibold mt-0.5">{label}</div>
-            <div className="text-[11px] opacity-70 mt-0.5">{note}</div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
 
-// ─── 2. Architecture ─────────────────────────────────────────────────────────
-
-function ArchFlow() {
-  const roles = [
-    { label: "Member",  border: "border-amber-300",   hdr: "bg-gradient-to-r from-amber-500 to-amber-600",   cred: "arjun_sharma",  Icon: FiUser,   color: "amber",
-      pages: [{ Icon: FiGrid, name: "Dashboard" },{ Icon: FiCalendar, name: "Book Classes" },{ Icon: FiList, name: "My Bookings" },{ Icon: FiTrendingUp, name: "BMI Tracker" },{ Icon: FiActivity, name: "Workout Log" },{ Icon: FiFeather, name: "Diet Plans" },{ Icon: FiCreditCard, name: "Transactions" },{ Icon: FiBell, name: "Notifications" },{ Icon: FiUser, name: "Profile" }] },
-    { label: "Trainer", border: "border-emerald-300",  hdr: "bg-gradient-to-r from-emerald-500 to-emerald-600", cred: "priya_trainer", Icon: FiUsers,  color: "green",
-      pages: [{ Icon: FiGrid, name: "Dashboard" },{ Icon: FiActivity, name: "My Classes" },{ Icon: FiCheckSquare, name: "Attendance" },{ Icon: FiFeather, name: "Diet Plans" },{ Icon: FiUsers, name: "My Members" },{ Icon: FiBell, name: "Notifications" },{ Icon: FiUser, name: "Profile" }] },
-    { label: "Admin",   border: "border-rose-300",     hdr: "bg-gradient-to-r from-rose-500 to-rose-600",     cred: "vikram_admin",  Icon: FiShield, color: "rose",
-      pages: [{ Icon: FiGrid, name: "Dashboard" },{ Icon: FiUsers, name: "Members" },{ Icon: FiBriefcase, name: "Trainers" },{ Icon: FiCalendar, name: "Classes" },{ Icon: FiTag, name: "Memberships" },{ Icon: FiCreditCard, name: "Transactions" },{ Icon: FiBell, name: "Notifications" },{ Icon: FiUser, name: "Profile" }] },
-  ];
-
-  return (
-    <section id="arch" className="mb-14 scroll-mt-16">
-      <SectionTitle icon={FiLayers} title="Three-Tier System Architecture" sub="Browser → REST API → MySQL — complete request/response path" />
-      <div className="max-w-4xl mx-auto">
-
-        {/* Browser */}
-        <div className="flex justify-center">
-          <div className="bg-blue-50 border-2 border-blue-300 rounded-2xl px-6 py-3 flex items-center gap-3 shadow-md w-full max-w-md">
-            <div className="w-9 h-9 rounded-xl bg-blue-500 flex items-center justify-center flex-shrink-0"><FiMonitor className="w-5 h-5 text-white" /></div>
-            <div>
-              <div className="font-bold text-blue-900 text-sm">Browser Client — Presentation Layer</div>
-              <div className="text-[11px] text-blue-500 font-mono mt-0.5">React 18 · Vite 4 · Redux Toolkit · React Router 6 · Tailwind CSS</div>
-            </div>
-          </div>
-        </div>
-        <div className="flex justify-center"><div className="w-0.5 h-6 bg-blue-300" /></div>
-
-        {/* Fork */}
-        <div className="relative grid grid-cols-3 h-8">
-          <div className="absolute top-0 h-0.5 bg-gray-300" style={{ left:"calc(100%/6)", right:"calc(100%/6)" }} />
-          {roles.map((_, i) => <div key={i} className="flex justify-center"><div className={`w-0.5 h-full ${["bg-amber-400","bg-emerald-400","bg-rose-400"][i]} mt-px`} /></div>)}
-        </div>
-        <div className="grid grid-cols-3 -mt-0.5 mb-1">
-          {["text-amber-400","text-emerald-400","text-rose-400"].map((cls, i) => (
-            <div key={i} className="flex justify-center"><FiArrowDown className={`w-3.5 h-3.5 ${cls}`} /></div>
-          ))}
-        </div>
-
-        {/* Role Cards */}
-        <div className="grid grid-cols-3 gap-2 mb-2">
-          {roles.map(({ label, border, hdr, cred, Icon: RIcon, color, pages }) => (
-            <div key={label} className={`rounded-2xl border-2 ${border} overflow-hidden bg-white shadow-md`}>
-              <div className={`${hdr} px-3 py-2 flex items-center gap-2`}>
-                <RIcon className="w-4 h-4 text-white" />
-                <span className="font-bold text-white text-sm">{label}</span>
-                <code className="ml-auto text-[10px] bg-white/20 text-white px-1.5 py-0.5 rounded-full font-mono">{cred}</code>
-              </div>
-              <div className="p-2.5 flex flex-wrap gap-1.5">
-                {pages.map(({ Icon, name }) => <Chip key={name} color={color}><Icon className="w-3 h-3" />{name}</Chip>)}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Merge */}
-        <div className="relative grid grid-cols-3 h-8">
-          {["bg-amber-400","bg-emerald-400","bg-rose-400"].map((cls, i) => (
-            <div key={i} className="flex justify-center"><div className={`w-0.5 h-full ${cls}`} /></div>
-          ))}
-          <div className="absolute bottom-0 h-0.5 bg-gray-400" style={{ left:"calc(100%/6)", right:"calc(100%/6)" }} />
-        </div>
-
-        {/* HTTP label */}
-        <div className="flex flex-col items-center gap-0.5 my-1">
-          <div className="w-0.5 h-4 bg-gray-300" />
-          <span className="text-[10px] font-mono text-gray-500 bg-white border border-gray-200 shadow-sm px-2.5 py-0.5 rounded-full">HTTP / REST JSON · Axios · /api/* · localhost:8080</span>
-          <div className="w-0.5 h-4 bg-gray-300" />
-          <FiArrowDown className="w-3.5 h-3.5 text-gray-400 -mt-0.5" />
-        </div>
-
-        {/* Spring Boot */}
-        <div className="flex justify-center mb-1">
-          <div className="w-full max-w-lg rounded-2xl border-2 border-emerald-300 bg-white shadow-md overflow-hidden">
-            <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 px-4 py-2.5 flex items-center gap-2">
-              <FiServer className="w-5 h-5 text-white" />
-              <span className="font-bold text-white">Spring Boot REST API — Business Logic Layer</span>
-              <span className="ml-auto text-xs bg-white/20 text-white px-2 py-0.5 rounded-full font-mono">:8080</span>
-            </div>
-            <div className="divide-y divide-gray-100">
-              {[
-                { Icon: FiSettings,    label: "Controllers (12)",  note: "Route mapping, request validation, HTTP responses" },
-                { Icon: FiLayers,      label: "Services (13)",     note: "Business rules, capacity checks, BMI calculation" },
-                { Icon: FiCheckCircle, label: "Repositories (12)", note: "Spring Data JPA — auto-generated CRUD + custom queries" },
-                { Icon: FiBox,         label: "Entities + DTOs",   note: "12 JPA entities · 17 payload classes · Lombok" },
-                { Icon: FiAlertCircle, label: "Exception Handler", note: "ResourceNotFoundException · AuthenticationException" },
-              ].map(({ Icon: LI, label, note }) => (
-                <div key={label} className="flex items-center gap-3 px-4 py-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center flex-shrink-0">
-                    <LI className="w-3.5 h-3.5 text-emerald-600" />
-                  </div>
-                  <div>
-                    <span className="font-semibold text-sm text-gray-800">{label}</span>
-                    <span className="text-[11px] text-gray-400 ml-2">{note}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* JPA label */}
-        <div className="flex flex-col items-center gap-0.5 my-1">
-          <div className="w-0.5 h-4 bg-gray-300" />
-          <span className="text-[10px] font-mono text-gray-500 bg-white border border-gray-200 shadow-sm px-2.5 py-0.5 rounded-full">Hibernate ORM · JDBC · port 3306</span>
-          <div className="w-0.5 h-4 bg-gray-300" />
-          <FiArrowDown className="w-3.5 h-3.5 text-gray-400 -mt-0.5" />
-        </div>
-
-        {/* MySQL */}
-        <div className="flex justify-center">
-          <div className="w-full max-w-lg rounded-2xl border-2 border-purple-300 bg-white shadow-md overflow-hidden">
-            <div className="bg-gradient-to-r from-purple-600 to-purple-700 px-4 py-2.5 flex items-center gap-2">
-              <FiDatabase className="w-5 h-5 text-white" />
-              <span className="font-bold text-white">MySQL Database — Data Layer</span>
-              <span className="ml-auto text-xs bg-white/20 text-white px-2 py-0.5 rounded-full font-mono">schema: gym</span>
-            </div>
-            <div className="grid grid-cols-3 gap-x-2 gap-y-0.5 px-4 py-3">
-              {["members","trainers","admins","fitness_classes","class_bookings","membership_plans","member_memberships","bmi_records","workout_history","diet_plans","transactions","notifications"].map((t) => (
-                <div key={t} className="flex items-center gap-1.5 py-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400 flex-shrink-0" />
-                  <span className="text-[11px] font-mono text-gray-600 truncate">{t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── 3. RBAC ─────────────────────────────────────────────────────────────────
-
-function RBAC() {
-  const features = [
-    { feature: "View Own Dashboard",           member: true,  trainer: true,  admin: true  },
-    { feature: "Register / Login",             member: true,  trainer: true,  admin: true  },
-    { feature: "Forgot Password (OTP)",        member: true,  trainer: true,  admin: true  },
-    { feature: "View & Edit Own Profile",      member: true,  trainer: true,  admin: true  },
-    { feature: "Book a Fitness Class",         member: true,  trainer: false, admin: false },
-    { feature: "Cancel Own Booking",           member: true,  trainer: false, admin: false },
-    { feature: "View Own Bookings",            member: true,  trainer: false, admin: false },
-    { feature: "Log Workout History",          member: true,  trainer: false, admin: false },
-    { feature: "View Own Workout History",     member: true,  trainer: false, admin: false },
-    { feature: "Record BMI",                   member: true,  trainer: false, admin: false },
-    { feature: "View BMI History",             member: true,  trainer: false, admin: false },
-    { feature: "View Assigned Diet Plans",     member: true,  trainer: false, admin: false },
-    { feature: "Subscribe to Membership Plan", member: true,  trainer: false, admin: false },
-    { feature: "View Own Transactions",        member: true,  trainer: false, admin: false },
-    { feature: "View Notifications",           member: true,  trainer: true,  admin: true  },
-    { feature: "Create & Manage Classes",      member: false, trainer: true,  admin: false },
-    { feature: "Mark Class Attendance",        member: false, trainer: true,  admin: false },
-    { feature: "Create Diet Plans for Members",member: false, trainer: true,  admin: false },
-    { feature: "View Assigned Members",        member: false, trainer: true,  admin: false },
-    { feature: "Manage All Members",           member: false, trainer: false, admin: true  },
-    { feature: "Manage All Trainers",          member: false, trainer: false, admin: true  },
-    { feature: "Manage All Classes",           member: false, trainer: false, admin: true  },
-    { feature: "Create Membership Plans",      member: false, trainer: false, admin: true  },
-    { feature: "View All Transactions",        member: false, trainer: false, admin: true  },
-    { feature: "Send Notifications",           member: false, trainer: false, admin: true  },
-    { feature: "Delete Members / Trainers",    member: false, trainer: false, admin: true  },
-  ];
-
-  const Y = () => <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100"><FiCheckCircle className="w-3.5 h-3.5 text-emerald-600" /></span>;
-  const N = () => <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-100"><span className="w-2.5 h-0.5 bg-gray-300 rounded-full block" /></span>;
-
-  return (
-    <section id="rbac" className="mb-14 scroll-mt-16">
-      <SectionTitle icon={FiShield} title="Role-Based Access Control (RBAC)" sub="Feature access matrix — who can do what" />
-      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-        <div className="grid grid-cols-4 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wide">
-          <div className="px-4 py-3 col-span-1">Feature / Permission</div>
-          <div className="px-4 py-3 text-center text-amber-600">Member</div>
-          <div className="px-4 py-3 text-center text-emerald-600">Trainer</div>
-          <div className="px-4 py-3 text-center text-rose-600">Admin</div>
-        </div>
-        {features.map(({ feature, member, trainer, admin }, idx) => (
-          <div key={feature} className={`grid grid-cols-4 border-b border-gray-100 last:border-0 ${idx % 2 === 1 ? "bg-gray-50/50" : ""}`}>
-            <div className="px-4 py-2.5 text-sm text-gray-700 flex items-center">{feature}</div>
-            <div className="px-4 py-2.5 flex items-center justify-center">{member ? <Y /> : <N />}</div>
-            <div className="px-4 py-2.5 flex items-center justify-center">{trainer ? <Y /> : <N />}</div>
-            <div className="px-4 py-2.5 flex items-center justify-center">{admin ? <Y /> : <N />}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
         {[
-          { role: "Member",  color: "amber",   Icon: FiUser,   cred: "arjun_sharma / Demo@1234",  desc: "Self-service fitness portal. Track health, book classes, manage membership." },
-          { role: "Trainer", color: "emerald",  Icon: FiUsers,  cred: "rohit_trainer / Demo@1234", desc: "Content creator. Manages classes, attendance, creates diet plans for members." },
-          { role: "Admin",   color: "rose",    Icon: FiShield, cred: "vikram_admin / Demo@1234",  desc: "Full system access. Manages users, plans, finances and system notifications." },
-        ].map(({ role, color, Icon: RI, cred, desc }) => {
-          const bg = { amber: "bg-amber-50 border-amber-200", emerald: "bg-emerald-50 border-emerald-200", rose: "bg-rose-50 border-rose-200" };
-          const tc = { amber: "text-amber-700", emerald: "text-emerald-700", rose: "text-rose-700" };
-          return (
-            <div key={role} className={`rounded-xl border p-4 ${bg[color]}`}>
-              <div className="flex items-center gap-2 mb-2">
-                <RI className={`w-4 h-4 ${tc[color]}`} />
-                <span className={`font-bold text-sm ${tc[color]}`}>{role}</span>
-              </div>
-              <code className="text-[10px] bg-white/70 border border-white px-2 py-0.5 rounded font-mono text-gray-500 block mb-2">{cred}</code>
-              <p className="text-xs text-gray-500">{desc}</p>
-            </div>
-          );
-        })}
+          ["3",   "User Roles",       "Member Â· Trainer Â· Admin"],
+          ["40+", "REST Endpoints",   "Across 12 controllers"],
+          ["12",  "Database Tables",  "Relational MySQL schema"],
+          ["24+", "Frontend Pages",   "Lazy-loaded components"],
+          ["11",  "Redux Slices",     "Per-feature state"],
+          ["2",   "Route Guards",     "Protected + Guest"],
+        ].map(([val, label, note]) => (
+          <div key={label} className="border border-gray-200 rounded-xl p-4 bg-white">
+            <div className="text-2xl font-extrabold text-gray-900">{val}</div>
+            <div className="text-xs font-semibold text-gray-700 mt-0.5">{label}</div>
+            <div className="text-[11px] text-gray-400 mt-0.5">{note}</div>
+          </div>
+        ))}
       </div>
+
+      <H3>Demo Credentials</H3>
+      <DarkBlock>
+        <div className="space-y-1">
+          {[
+            ["member",  "arjun_sharma",  "Demo@1234", "/dashboard/member/home"],
+            ["trainer", "rohit_trainer", "Demo@1234", "/dashboard/trainer/home"],
+            ["admin",   "vikram_admin",  "Demo@1234", "/dashboard/admin/home"],
+          ].map(([role, user, pass, path]) => (
+            <div key={role} className="flex flex-wrap gap-x-3 gap-y-0.5">
+              <span className="text-orange-400 font-semibold w-14">{role}</span>
+              <span className="text-gray-300">{user}</span>
+              <span className="text-gray-500">/</span>
+              <span className="text-emerald-400">{pass}</span>
+              <span className="text-gray-600 ml-auto text-[11px]">{path}</span>
+            </div>
+          ))}
+        </div>
+      </DarkBlock>
     </section>
   );
 }
 
-// ─── 4. Auth Flow ─────────────────────────────────────────────────────────────
-
-function AuthFlow() {
+function SectionArchitecture() {
   return (
-    <section id="authflow" className="mb-14 scroll-mt-16">
-      <SectionTitle icon={FiLock} title="Authentication & Route Guard Flow" sub="Login, session, protected routes, guest routes" />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <section>
+      <Divider />
+      <H2 id="architecture">System Architecture</H2>
+      <P>Three-tier architecture â€” Presentation (React SPA) â†’ Business Logic (Spring Boot) â†’ Data (MySQL).</P>
 
-        {/* Login flow */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-          <h3 className="font-bold text-gray-800 text-sm mb-4 flex items-center gap-2"><FiKey className="text-amber-500" />Login Flow</h3>
-          <div className="flex flex-col gap-0">
+      <div className="space-y-3 mb-8">
+        {/* Tier 1 */}
+        <div className="border border-blue-200 bg-blue-50 rounded-xl p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-xs font-bold text-blue-500 uppercase tracking-widest">Tier 1 â€” Presentation</span>
+            <span className="ml-auto font-mono text-[11px] text-blue-400">localhost:5173</span>
+          </div>
+          <div className="font-semibold text-blue-900 text-sm mb-2">React 18 SPA</div>
+          <div className="flex flex-wrap gap-1.5">
+            {["Vite 4","Redux Toolkit","React Router 6","Axios","Tailwind CSS","Material Tailwind","React Icons","ApexCharts"].map(t => (
+              <span key={t} className="bg-white text-blue-700 border border-blue-200 text-[11px] font-medium px-2 py-0.5 rounded">{t}</span>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-center">
+          <div className="flex flex-col items-center gap-1 py-1">
+            <div className="w-px h-4 bg-gray-300" />
+            <span className="text-[10px] font-mono text-gray-400 bg-white border border-gray-200 px-2 py-0.5 rounded-full">HTTP / REST JSON Â· Axios Â· /api/*</span>
+            <div className="w-px h-4 bg-gray-300" />
+            <span className="text-gray-300 text-xs">â†“</span>
+          </div>
+        </div>
+
+        {/* Tier 2 */}
+        <div className="border border-emerald-200 bg-emerald-50 rounded-xl p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Tier 2 â€” Business Logic</span>
+            <span className="ml-auto font-mono text-[11px] text-emerald-500">localhost:8080</span>
+          </div>
+          <div className="font-semibold text-emerald-900 text-sm mb-2">Spring Boot 3.2 REST API</div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[12px]">
             {[
-              { step: "1", label: "User submits credentials", note: "username + password", color: "bg-blue-500" },
-              { step: "2", label: "Redux loginThunk dispatched", note: "POST /api/{role}/login", color: "bg-indigo-500" },
-              { step: "3", label: "Spring Boot validates", note: "Username + plain-text password check", color: "bg-emerald-500" },
-              { step: "4", label: "Member/Trainer/Admin object returned", note: "JSON response body", color: "bg-teal-500" },
-              { step: "5", label: "Redux stores currentUser", note: "Redux state updated", color: "bg-amber-500" },
-              { step: "6", label: "localStorage persisted", note: "memberId · memberData · userRole", color: "bg-orange-500" },
-              { step: "7", label: "Navigate to /dashboard/{role}/home", note: "React Router redirect", color: "bg-rose-500" },
-            ].map(({ step, label, note, color }, i, arr) => (
-              <div key={step} className="flex items-start gap-3">
-                <div className="flex flex-col items-center flex-shrink-0">
-                  <div className={`w-7 h-7 rounded-full ${color} text-white text-xs font-bold flex items-center justify-center`}>{step}</div>
-                  {i < arr.length - 1 && <div className="w-0.5 h-5 bg-gray-200 my-0.5" />}
-                </div>
-                <div className="pb-3">
-                  <div className="text-sm font-medium text-gray-800">{label}</div>
-                  <div className="text-[11px] text-gray-400 font-mono">{note}</div>
-                </div>
+              ["Controllers (12)", "Route mapping, request validation, HTTP responses"],
+              ["Services (13)", "Business rules, BMI calc, capacity checks, OTP"],
+              ["Repositories (12)", "Spring Data JPA â€” CRUD + custom queries"],
+            ].map(([name, note]) => (
+              <div key={name} className="bg-white rounded-lg p-2.5 border border-emerald-100">
+                <div className="font-semibold text-emerald-800">{name}</div>
+                <div className="text-gray-400 mt-0.5 leading-tight">{note}</div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Route guards */}
-        <div className="flex flex-col gap-4">
-          <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-            <h3 className="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2"><FiShield className="text-rose-500" />ProtectedRoute</h3>
-            <p className="text-xs text-gray-500 mb-3">Wraps all <code className="bg-gray-100 px-1 rounded">/dashboard/*</code> routes. Checks <code className="bg-gray-100 px-1 rounded">localStorage.userRole</code>.</p>
-            <div className="flex flex-col gap-1.5 text-xs font-mono">
-              <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
-                <span className="text-gray-400">if</span>
-                <span className="text-rose-600">!userRole</span>
-                <FiArrowRight className="w-3 h-3 text-gray-400 mx-1" />
-                <span className="text-blue-600">{"<Navigate to='/auth' />"}</span>
-              </div>
-              <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
-                <span className="text-gray-400">if</span>
-                <span className="text-rose-600">role !== allowedRole</span>
-                <FiArrowRight className="w-3 h-3 text-gray-400 mx-1" />
-                <span className="text-blue-600">{"<Navigate to='/dashboard/{role}/home' />"}</span>
-              </div>
-              <div className="flex items-center gap-2 bg-emerald-50 rounded-lg px-3 py-2">
-                <span className="text-gray-400">else</span>
-                <FiArrowRight className="w-3 h-3 text-gray-400 mx-1" />
-                <span className="text-emerald-600">render children ✓</span>
-              </div>
-            </div>
+        <div className="flex justify-center">
+          <div className="flex flex-col items-center gap-1 py-1">
+            <div className="w-px h-4 bg-gray-300" />
+            <span className="text-[10px] font-mono text-gray-400 bg-white border border-gray-200 px-2 py-0.5 rounded-full">Hibernate ORM Â· JDBC Â· port 3306</span>
+            <div className="w-px h-4 bg-gray-300" />
+            <span className="text-gray-300 text-xs">â†“</span>
           </div>
+        </div>
 
-          <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-            <h3 className="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2"><FiGitBranch className="text-blue-500" />GuestRoute</h3>
-            <p className="text-xs text-gray-500 mb-3">Wraps the entire <code className="bg-gray-100 px-1 rounded">/auth</code> layout. Prevents logged-in users from accessing login/signup.</p>
-            <div className="flex flex-col gap-1.5 text-xs font-mono">
-              <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
-                <span className="text-gray-400">if</span>
-                <span className="text-rose-600">userRole exists</span>
-                <FiArrowRight className="w-3 h-3 text-gray-400 mx-1" />
-                <span className="text-blue-600">{"<Navigate to='/dashboard/{role}/home' />"}</span>
-              </div>
-              <div className="flex items-center gap-2 bg-emerald-50 rounded-lg px-3 py-2">
-                <span className="text-gray-400">else</span>
-                <FiArrowRight className="w-3 h-3 text-gray-400 mx-1" />
-                <span className="text-emerald-600">render auth page ✓</span>
-              </div>
-            </div>
+        {/* Tier 3 */}
+        <div className="border border-purple-200 bg-purple-50 rounded-xl p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-xs font-bold text-purple-500 uppercase tracking-widest">Tier 3 â€” Data</span>
+            <span className="ml-auto font-mono text-[11px] text-purple-400">schema: gym</span>
           </div>
-
-          <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-            <h3 className="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2"><FiCheckSquare className="text-emerald-500" />Session Persistence</h3>
-            <div className="flex flex-col gap-2 text-xs">
-              {[
-                ["memberId",   "Numeric DB ID used for all API calls"],
-                ["memberData", "Full user JSON for name/profile display"],
-                ["userRole",   "member | trainer | admin — drives routing"],
-              ].map(([k, v]) => (
-                <div key={k} className="flex items-start gap-2 bg-gray-50 rounded-lg px-3 py-2">
-                  <code className="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-mono text-[11px] flex-shrink-0">{k}</code>
-                  <span className="text-gray-500">{v}</span>
-                </div>
-              ))}
-            </div>
+          <div className="font-semibold text-purple-900 text-sm mb-2">MySQL 8 Database</div>
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-1">
+            {["members","trainers","admins","fitness_classes","class_bookings","membership_plans","member_memberships","bmi_records","workout_history","diet_plans","transactions","notifications"].map(t => (
+              <span key={t} className="font-mono text-[10px] text-purple-600 bg-white border border-purple-100 px-2 py-1 rounded">{t}</span>
+            ))}
           </div>
         </div>
       </div>
+
+      <H3>Role Routing</H3>
+      <P>Each authenticated role has its own isolated dashboard URL namespace, guarded by <Code>ProtectedRoute</Code>.</P>
+      <DarkBlock>
+        {[
+          {role:"member",  color:"text-amber-400",  path:"/dashboard/member/home",  cred:"arjun_sharma"},
+          {role:"trainer", color:"text-emerald-400", path:"/dashboard/trainer/home", cred:"rohit_trainer"},
+          {role:"admin",   color:"text-rose-400",    path:"/dashboard/admin/home",   cred:"vikram_admin"},
+        ].map(({role,color,path,cred})=>(
+          <div key={role} className="flex items-center gap-3 mb-1 last:mb-0">
+            <span className={`${color} font-bold w-16`}>{role}</span>
+            <span className="text-gray-300">{path}</span>
+            <span className="ml-auto text-gray-500 text-[11px]">{cred}</span>
+          </div>
+        ))}
+      </DarkBlock>
     </section>
   );
 }
 
-// ─── 5. Frontend Architecture ────────────────────────────────────────────────
-
-function FrontendArch() {
-  const slices = [
-    { name: "memberSlice",          state: "currentMember, loading, error",         actions: "loginMemberThunk, fetchMemberById, logoutMember" },
-    { name: "trainerSlice",         state: "currentTrainer, trainers, loading",      actions: "loginTrainerThunk, fetchAllTrainers" },
-    { name: "adminSlice",           state: "currentAdmin, loading, error",           actions: "loginAdminThunk, fetchAdminById" },
-    { name: "classSlice",           state: "classes, loading, error",               actions: "fetchFitnessClasses, createClass, updateClass" },
-    { name: "bookingSlice",         state: "bookings, loading, error",              actions: "fetchMemberBookings, bookClassThunk, cancelBookingThunk" },
-    { name: "bmiSlice",             state: "records, loading, error",               actions: "fetchBMIHistory, recordBMIThunk" },
-    { name: "workoutHistorySlice",  state: "workouts, loading, error",              actions: "fetchWorkouts, logWorkoutThunk, deleteWorkoutThunk" },
-    { name: "dietPlanSlice",        state: "dietPlans, loading, error",             actions: "fetchMemberDietPlans, createDietPlanThunk" },
-    { name: "membershipSlice",      state: "memberships, activeMembership, loading", actions: "fetchMemberships, subscribeToPlanThunk" },
-    { name: "transactionSlice",     state: "transactions, loading",                 actions: "fetchMemberTransactions, fetchAllTransactions" },
-    { name: "notificationSlice",    state: "notifications, loading",                actions: "fetchNotifications, markReadThunk" },
+function SectionRBAC() {
+  const features = [
+    ["View own dashboard",           true,  true,  true ],
+    ["Register & login",             true,  true,  true ],
+    ["Forgot password (OTP email)",  true,  true,  true ],
+    ["Edit own profile",             true,  true,  true ],
+    ["View notifications",           true,  true,  true ],
+    ["Book a fitness class",         true,  false, false],
+    ["Cancel own booking",           true,  false, false],
+    ["Log workout history",          true,  false, false],
+    ["Record BMI",                   true,  false, false],
+    ["View BMI history",             true,  false, false],
+    ["View assigned diet plans",     true,  false, false],
+    ["Subscribe to membership plan", true,  false, false],
+    ["View own transactions",        true,  false, false],
+    ["Create & manage classes",      false, true,  false],
+    ["Mark class attendance",        false, true,  false],
+    ["Create diet plans for members",false, true,  false],
+    ["View assigned members",        false, true,  false],
+    ["Manage all members",           false, false, true ],
+    ["Manage all trainers",          false, false, true ],
+    ["Manage all classes",           false, false, true ],
+    ["Create membership plans",      false, false, true ],
+    ["View all transactions",        false, false, true ],
+    ["Send system notifications",    false, false, true ],
+    ["Delete any account",           false, false, true ],
   ];
 
   return (
-    <section id="frontend" className="mb-14 scroll-mt-16">
-      <SectionTitle icon={FiMonitor} title="Frontend Architecture" sub="React 18 · Vite · Redux Toolkit · React Router 6" />
+    <section>
+      <Divider />
+      <H2 id="rbac">Role-Based Access Control</H2>
+      <P>Every frontend route is wrapped with <Code>ProtectedRoute</Code> that checks <Code>localStorage.userRole</Code> and redirects on mismatch. The table below defines the permission boundary for each role.</P>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
-        {/* Routing */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-          <h3 className="font-bold text-gray-800 text-sm mb-4 flex items-center gap-2"><FiGitBranch className="text-indigo-500" />Route Structure</h3>
-          <div className="font-mono text-[11px] text-gray-600 space-y-0.5 leading-relaxed">
-            {[
-              { indent: 0, text: "/", color: "text-gray-400" },
-              { indent: 1, text: "→ /auth  [GuestRoute + Auth layout]", color: "text-blue-500" },
-              { indent: 2, text: "LoginTypeSelection (index)", color: "text-gray-500" },
-              { indent: 2, text: "member/sign-in  |  member/sign-up", color: "text-gray-500" },
-              { indent: 2, text: "trainer/sign-in  |  trainer/sign-up", color: "text-gray-500" },
-              { indent: 2, text: "admin/sign-in  |  admin/sign-up", color: "text-gray-500" },
-              { indent: 2, text: "forgot-password", color: "text-gray-500" },
-              { indent: 1, text: "→ /dashboard/member  [ProtectedRoute]", color: "text-amber-500" },
-              { indent: 2, text: "home · book-classes · bookings · bmi", color: "text-gray-500" },
-              { indent: 2, text: "workouts · diet-plans · transactions", color: "text-gray-500" },
-              { indent: 1, text: "→ /dashboard/trainer  [ProtectedRoute]", color: "text-emerald-500" },
-              { indent: 2, text: "home · classes · attendance · members", color: "text-gray-500" },
-              { indent: 1, text: "→ /dashboard/admin  [ProtectedRoute]", color: "text-rose-500" },
-              { indent: 2, text: "home · members · trainers · classes", color: "text-gray-500" },
-              { indent: 1, text: "→ /system-design", color: "text-purple-500" },
-              { indent: 1, text: "→ * → /auth (fallback)", color: "text-gray-400" },
-            ].map(({ indent, text, color }, i) => (
-              <div key={i} style={{ paddingLeft: `${indent * 14}px` }} className={`${color}`}>{text}</div>
-            ))}
-          </div>
-        </div>
-
-        {/* Component Tree */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-          <h3 className="font-bold text-gray-800 text-sm mb-4 flex items-center gap-2"><FiCode className="text-blue-500" />Component Hierarchy</h3>
-          <div className="font-mono text-[11px] text-gray-600 space-y-0.5 leading-relaxed">
-            {[
-              { indent: 0, text: "App.jsx", color: "text-gray-900 font-bold" },
-              { indent: 1, text: "Provider (Redux store)", color: "text-purple-600" },
-              { indent: 2, text: "RouterProvider", color: "text-blue-600" },
-              { indent: 3, text: "Auth layout", color: "text-blue-500" },
-              { indent: 4, text: "← hero panel  |  Outlet →", color: "text-gray-400" },
-              { indent: 4, text: "LoginTypeSelection / SignIn / SignUp", color: "text-gray-500" },
-              { indent: 3, text: "Dashboard layout", color: "text-amber-500" },
-              { indent: 4, text: "Sidenav (logo + nav links)", color: "text-gray-500" },
-              { indent: 4, text: "DashboardNavbar (breadcrumbs)", color: "text-gray-500" },
-              { indent: 4, text: "Outlet → page content", color: "text-gray-500" },
-              { indent: 5, text: "Widgets: StatisticsCard, Charts", color: "text-gray-400" },
-              { indent: 5, text: "Pages: Home, BMI, Workouts…", color: "text-gray-400" },
-            ].map(({ indent, text, color }, i) => (
-              <div key={i} style={{ paddingLeft: `${indent * 14}px` }} className={color}>{text}</div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Redux slices */}
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-        <div className="px-5 py-3 border-b border-gray-100 bg-gray-50">
-          <h3 className="font-bold text-gray-800 text-sm flex items-center gap-2"><FiBox className="text-purple-500" />Redux Toolkit — 11 Slices</h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-500">Slice</th>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-500">State Shape</th>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-500">Async Thunks / Actions</th>
+      <div className="overflow-x-auto rounded-xl border border-gray-200 mb-8">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Permission</th>
+              <th className="px-4 py-3 text-center text-xs font-semibold text-amber-600 uppercase tracking-wide">Member</th>
+              <th className="px-4 py-3 text-center text-xs font-semibold text-emerald-600 uppercase tracking-wide">Trainer</th>
+              <th className="px-4 py-3 text-center text-xs font-semibold text-rose-500 uppercase tracking-wide">Admin</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {features.map(([feat, m, t, a]) => (
+              <tr key={feat} className="hover:bg-gray-50 transition-colors">
+                <td className="px-4 py-2.5 text-gray-700">{feat}</td>
+                <td className="px-4 py-2.5 text-center"><Check yes={m} /></td>
+                <td className="px-4 py-2.5 text-center"><Check yes={t} /></td>
+                <td className="px-4 py-2.5 text-center"><Check yes={a} /></td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {slices.map(({ name, state, actions }, i) => (
-                <tr key={name} className={i % 2 === 1 ? "bg-gray-50/50" : ""}>
-                  <td className="px-4 py-2 font-mono text-purple-600 font-semibold whitespace-nowrap">{name}</td>
-                  <td className="px-4 py-2 font-mono text-gray-500 text-[11px]">{state}</td>
-                  <td className="px-4 py-2 font-mono text-gray-500 text-[11px]">{actions}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <H3>Role Responsibilities</H3>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[
+          {role:"Member",  color:"border-amber-200 bg-amber-50",   tc:"text-amber-700",  desc:"Self-service health portal. Track BMI, log workouts, book classes, subscribe to plans, view diet plans assigned by trainer."},
+          {role:"Trainer", color:"border-emerald-200 bg-emerald-50",tc:"text-emerald-700",desc:"Content creator. Creates and manages fitness classes, marks attendance, creates diet plans for assigned members."},
+          {role:"Admin",   color:"border-rose-200 bg-rose-50",     tc:"text-rose-600",   desc:"Full system access. Manages all users, classes, membership plans, views all transactions, broadcasts notifications."},
+        ].map(({role,color,tc,desc})=>(
+          <div key={role} className={`rounded-xl border p-4 ${color}`}>
+            <div className={`font-bold text-sm mb-2 ${tc}`}>{role}</div>
+            <p className="text-xs text-gray-500 leading-relaxed">{desc}</p>
+          </div>
+        ))}
       </div>
     </section>
   );
 }
 
-// ─── 6. Backend Architecture ─────────────────────────────────────────────────
-
-function BackendArch() {
-  const layers = [
-    {
-      name: "Controller Layer",
-      color: "border-blue-300 bg-blue-50",
-      titleColor: "text-blue-700",
-      Icon: FiSettings,
-      items: [
-        { name: "MemberController",           note: "/api/members — register, login, forgot-password, CRUD" },
-        { name: "TrainerController",           note: "/api/trainers — register, login, CRUD" },
-        { name: "AdminController",             note: "/api/admin — register, login, CRUD" },
-        { name: "FitnessClassController",      note: "/api/fitness-classes — class management" },
-        { name: "ClassBookingController",      note: "/api/bookings — book, cancel, attend" },
-        { name: "BMIRecordController",         note: "/api/bmi — record, history" },
-        { name: "WorkoutHistoryController",    note: "/api/workout-history — log, list, delete" },
-        { name: "DietPlanController",          note: "/api/diet-plans — CRUD by trainer for member" },
-        { name: "MembershipPlanController",    note: "/api/membership-plans — admin CRUD" },
-        { name: "MemberMembershipController",  note: "/api/memberships — subscribe, cancel" },
-        { name: "TransactionController",       note: "/api/transactions — record, list" },
-        { name: "NotificationController",      note: "/api/notifications — create, read, delete" },
-      ],
-    },
-    {
-      name: "Service Layer",
-      color: "border-emerald-300 bg-emerald-50",
-      titleColor: "text-emerald-700",
-      Icon: FiLayers,
-      items: [
-        { name: "MemberService",           note: "Login validation, OTP email, profile update" },
-        { name: "TrainerService",           note: "Login, profile, OTP flow" },
-        { name: "AdminService",             note: "Admin login, profile management" },
-        { name: "FitnessClassService",      note: "Create class, capacity validation, enrollment" },
-        { name: "ClassBookingService",      note: "Booking rules, status transitions, attendance" },
-        { name: "BMIRecordService",         note: "BMI calculation, auto-categorization" },
-        { name: "WorkoutHistoryService",    note: "Workout CRUD, per-member filtering" },
-        { name: "DietPlanService",          note: "Plan creation/update by trainer, latest plan" },
-        { name: "MembershipPlanService",    note: "Plan CRUD, activation toggle" },
-        { name: "MemberMembershipService",  note: "Subscribe, cancel, active membership check" },
-        { name: "TransactionService",       note: "Record payment, per-member history" },
-        { name: "NotificationService",      note: "Broadcast, per-role filter, mark-read" },
-        { name: "EmailService",             note: "OTP email via Spring Mail / Gmail SMTP" },
-      ],
-    },
-  ];
-
+function SectionAuthFlow() {
   return (
-    <section id="backend" className="mb-14 scroll-mt-16">
-      <SectionTitle icon={FiServer} title="Backend Architecture" sub="Spring Boot 3.2 · Java 17 · Maven · Layered architecture" />
+    <section>
+      <Divider />
+      <H2 id="auth-flow">Authentication & Route Guards</H2>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
-        {layers.map(({ name, color, titleColor, Icon: LI, items }) => (
-          <div key={name} className={`rounded-2xl border ${color} overflow-hidden shadow-sm`}>
-            <div className={`px-4 py-3 border-b border-white/50 flex items-center gap-2`}>
-              <LI className={`w-4 h-4 ${titleColor}`} />
-              <span className={`font-bold text-sm ${titleColor}`}>{name}</span>
-              <Badge color="gray" className="ml-auto">{items.length} classes</Badge>
+      <H3>Login Flow</H3>
+      <div className="mb-6 space-y-0">
+        {[
+          ["1", "User submits credentials",              "username + password on sign-in form"],
+          ["2", "Redux async thunk dispatched",          "loginMemberThunk / loginTrainerThunk / loginAdminThunk"],
+          ["3", "POST to Spring Boot API",               "/api/{role}/login â€” returns full user JSON"],
+          ["4", "Redux state updated",                   "currentMember / currentTrainer / currentAdmin"],
+          ["5", "localStorage populated",               "memberId  Â·  memberData  Â·  userRole"],
+          ["6", "React Router navigates",               "/dashboard/{role}/home via useNavigate"],
+        ].map(([n, label, detail], i, arr) => (
+          <div key={n} className="flex gap-3">
+            <div className="flex flex-col items-center flex-shrink-0">
+              <div className="w-6 h-6 rounded-full bg-orange-100 text-orange-600 text-[11px] font-bold flex items-center justify-center flex-shrink-0">{n}</div>
+              {i < arr.length-1 && <div className="w-px h-5 bg-gray-200 my-0.5"/>}
             </div>
-            <div className="divide-y divide-white/50 max-h-64 overflow-y-auto">
-              {items.map(({ name: n, note }) => (
-                <div key={n} className="px-4 py-2 flex items-start gap-2">
-                  <span className="font-mono text-[11px] font-semibold text-gray-700 whitespace-nowrap flex-shrink-0">{n}</span>
-                  <span className="text-[11px] text-gray-400">{note}</span>
-                </div>
-              ))}
+            <div className="pb-4">
+              <div className="text-sm font-medium text-gray-800">{label}</div>
+              <div className="text-xs text-gray-400 font-mono mt-0.5">{detail}</div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-        <h3 className="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2"><FiSettings className="text-gray-500" />Configuration Classes</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-          {[
-            { name: "CorsConfig",    note: "Allows requests from http://localhost:5173. Maps all /api/** routes." },
-            { name: "EmailConfig",   note: "Gmail SMTP via Spring Mail. Used by OTP forgot-password flow." },
-            { name: "FirebaseConfig",note: "Placeholder for future Firebase cloud integration (currently disabled)." },
-          ].map(({ name: n, note }) => (
-            <div key={n} className="bg-gray-50 rounded-xl p-3">
-              <code className="text-purple-600 font-bold text-[11px]">{n}.java</code>
-              <p className="text-gray-400 mt-1">{note}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+      <H3>ProtectedRoute</H3>
+      <P>Wraps every <Code>/dashboard/*</Code> route. Checks <Code>localStorage.userRole</Code> before rendering.</P>
+      <DarkBlock>
+        <div className="text-gray-500 mb-2">{"// utils/ProtectedRoute.js"}</div>
+        <div><span className="text-purple-400">if</span> <span className="text-gray-300">(!userRole)</span></div>
+        <div className="pl-4 text-gray-400">{"â†’ "}<span className="text-blue-400">{"<Navigate to='/auth' replace />"}</span></div>
+        <div><span className="text-purple-400">if</span> <span className="text-gray-300">(userRole !== allowedRole)</span></div>
+        <div className="pl-4 text-gray-400">{"â†’ "}<span className="text-blue-400">{"<Navigate to='/dashboard/{role}/home' replace />"}</span></div>
+        <div><span className="text-purple-400">else</span></div>
+        <div className="pl-4 text-emerald-400">{"â†’ render children âœ“"}</div>
+      </DarkBlock>
+
+      <H3>GuestRoute</H3>
+      <P>Wraps the entire <Code>/auth</Code> layout. Redirects logged-in users away from sign-in/sign-up pages.</P>
+      <DarkBlock>
+        <div className="text-gray-500 mb-2">{"// utils/ProtectedRoute.js â€” GuestRoute"}</div>
+        <div><span className="text-purple-400">if</span> <span className="text-gray-300">(userRole exists)</span></div>
+        <div className="pl-4 text-gray-400">{"â†’ "}<span className="text-blue-400">{"<Navigate to='/dashboard/{role}/home' replace />"}</span></div>
+        <div><span className="text-purple-400">else</span></div>
+        <div className="pl-4 text-emerald-400">{"â†’ render auth page âœ“"}</div>
+      </DarkBlock>
+
+      <H3>localStorage Session Keys</H3>
+      <Table
+        head={["Key", "Value", "Purpose"]}
+        rows={[
+          [<Code>memberId</Code>,   "Numeric DB id",     "Used in every API call as path/query param"],
+          [<Code>memberData</Code>, "Full user JSON",    "Populates profile, name, avatar in the UI"],
+          [<Code>userRole</Code>,   "member|trainer|admin", "Drives route guard decisions + sidenav config"],
+        ]}
+      />
     </section>
   );
 }
 
-// ─── 7. Database Schema ───────────────────────────────────────────────────────
+function SectionFrontend() {
+  return (
+    <section>
+      <Divider />
+      <H2 id="frontend">Frontend Architecture</H2>
+      <P>Single-page application built with React 18 and Vite. State is managed globally via Redux Toolkit; routing is handled by React Router 6 with lazy-loaded pages.</P>
 
-function DatabaseSchema() {
-  const [expanded, setExpanded] = useState(null);
-  const entities = [
-    { name: "members",            color: "bg-amber-500",   fields: ["id PK","memberId UQ","username UQ","email UQ","password","firstName","lastName","phone","dob","age","gender ENUM","heightCm","weightKg","fitnessGoals","healthConditions","trainerPreference","imageUrl","otp","otpExpiry","createdAt","updatedAt"] },
-    { name: "trainers",           color: "bg-emerald-500", fields: ["id PK","trainerId UQ","username UQ","email UQ","password","firstName","lastName","phone","specialization","certificationLevel","bio","imageUrl","otp","otpExpiry","createdAt","updatedAt"] },
-    { name: "admins",             color: "bg-rose-500",    fields: ["id PK","adminId UQ","username UQ","email UQ","password","firstName","lastName","phone","createdAt","updatedAt"] },
-    { name: "membership_plans",   color: "bg-blue-500",    fields: ["id PK","planName","planType ENUM","price","durationDays","description","isActive","createdAt"] },
-    { name: "member_memberships", color: "bg-indigo-500",  fields: ["id PK","member_id FK→members","plan_id FK→membership_plans","startDate","endDate","status ENUM","paymentStatus ENUM","createdAt"] },
-    { name: "fitness_classes",    color: "bg-teal-500",    fields: ["id PK","className","classType ENUM","trainer_id FK→trainers","scheduledDay ENUM","scheduledTime","durationMinutes","capacity","currentEnrollment","description","isActive","createdAt","updatedAt"] },
-    { name: "class_bookings",     color: "bg-cyan-500",    fields: ["id PK","member_id FK→members","fitness_class_id FK→fitness_classes","bookingDate","status ENUM","createdAt"] },
-    { name: "bmi_records",        color: "bg-orange-500",  fields: ["id PK","member_id FK→members","heightCm","weightKg","bmi","category ENUM","recordDate","notes","createdAt"] },
-    { name: "workout_history",    color: "bg-yellow-600",  fields: ["id PK","member_id FK→members","trainer_id FK→trainers","workoutDate","exerciseName","sets","reps","weightKg","durationMinutes","notes","createdAt"] },
-    { name: "diet_plans",         color: "bg-lime-600",    fields: ["id PK","member_id FK→members","trainer_id FK→trainers","planName","description","totalCalories","proteinGrams","carbsGrams","fatsGrams","createdAt","updatedAt"] },
-    { name: "transactions",       color: "bg-purple-500",  fields: ["id PK","member_id FK→members","transactionType ENUM","amount","description","transactionDate","paymentMethod ENUM","status ENUM","createdAt"] },
-    { name: "notifications",      color: "bg-gray-500",    fields: ["id PK","title","message","recipientType ENUM","isRead","createdAt"] },
+      <H3>Route Tree</H3>
+      <DarkBlock>
+        {[
+          {d:0, t:"/",                                  c:"text-gray-500"},
+          {d:1, t:"â†’ /auth  [GuestRoute + Auth layout]", c:"text-blue-400"},
+          {d:2, t:"index  LoginTypeSelection",          c:"text-gray-400"},
+          {d:2, t:"member/sign-in   member/sign-up",    c:"text-gray-400"},
+          {d:2, t:"trainer/sign-in  trainer/sign-up",   c:"text-gray-400"},
+          {d:2, t:"admin/sign-in    admin/sign-up",     c:"text-gray-400"},
+          {d:2, t:"forgot-password",                    c:"text-gray-400"},
+          {d:1, t:"â†’ /dashboard/member  [ProtectedRoute, role=member]", c:"text-amber-400"},
+          {d:2, t:"home  book-classes  bookings  bmi  workouts  diet-plans  transactions  notifications  profile", c:"text-gray-400"},
+          {d:1, t:"â†’ /dashboard/trainer [ProtectedRoute, role=trainer]", c:"text-emerald-400"},
+          {d:2, t:"home  classes  attendance  diet-plans  members  notifications  profile", c:"text-gray-400"},
+          {d:1, t:"â†’ /dashboard/admin  [ProtectedRoute, role=admin]",   c:"text-rose-400"},
+          {d:2, t:"home  members  trainers  classes  memberships  transactions  notifications  profile", c:"text-gray-400"},
+          {d:1, t:"â†’ /system-design",                  c:"text-purple-400"},
+          {d:1, t:"â†’ *  â†’  /auth  (fallback)",         c:"text-gray-600"},
+        ].map(({d,t,c},i)=>(
+          <div key={i} className={`${c} leading-relaxed`} style={{paddingLeft:`${d*16}px`}}>{t}</div>
+        ))}
+      </DarkBlock>
+
+      <H3>Redux Store â€” 11 Slices</H3>
+      <Table
+        head={["Slice", "State", "Thunks"]}
+        rows={[
+          [<Tag color="purple">memberSlice</Tag>,         "currentMember, loading, error",          "loginMemberThunk, fetchMemberById"],
+          [<Tag color="purple">trainerSlice</Tag>,        "currentTrainer, trainers[], loading",     "loginTrainerThunk, fetchAllTrainers"],
+          [<Tag color="purple">adminSlice</Tag>,          "currentAdmin, loading, error",            "loginAdminThunk, fetchAdminById"],
+          [<Tag color="purple">classSlice</Tag>,          "classes[], loading, error",               "fetchFitnessClasses, createClass"],
+          [<Tag color="purple">bookingSlice</Tag>,        "bookings[], loading, error",              "fetchMemberBookings, bookClassThunk"],
+          [<Tag color="purple">bmiSlice</Tag>,            "records[], loading, error",               "fetchBMIHistory, recordBMIThunk"],
+          [<Tag color="purple">workoutHistorySlice</Tag>, "workouts[], loading, error",              "fetchWorkouts, logWorkoutThunk"],
+          [<Tag color="purple">dietPlanSlice</Tag>,       "dietPlans[], loading, error",             "fetchMemberDietPlans, createDietPlanThunk"],
+          [<Tag color="purple">membershipSlice</Tag>,     "memberships[], activeMembership",         "fetchMemberships, subscribeToPlanThunk"],
+          [<Tag color="purple">transactionSlice</Tag>,    "transactions[], loading",                 "fetchMemberTransactions"],
+          [<Tag color="purple">notificationSlice</Tag>,   "notifications[], loading",                "fetchNotifications, markReadThunk"],
+        ]}
+      />
+
+      <H3>Component Hierarchy</H3>
+      <DarkBlock>
+        {[
+          {d:0,t:"App.jsx",                              c:"text-white font-semibold"},
+          {d:1,t:"<Provider store={store}>",             c:"text-purple-400"},
+          {d:2,t:"<RouterProvider>",                     c:"text-blue-400"},
+          {d:3,t:"Auth layout  (split-screen hero + form panel)", c:"text-blue-300"},
+          {d:4,t:"<Outlet>  â†’  SignIn / SignUp / Forgot", c:"text-gray-400"},
+          {d:3,t:"Dashboard layout  (sidenav + navbar + outlet)", c:"text-amber-400"},
+          {d:4,t:"<Sidenav>  logo â†’ role home Â· nav links", c:"text-gray-400"},
+          {d:4,t:"<DashboardNavbar>  breadcrumbs Â· profile", c:"text-gray-400"},
+          {d:4,t:"<Outlet>  â†’  page content",            c:"text-gray-400"},
+          {d:5,t:"StatisticsCard Â· Charts Â· Tables",     c:"text-gray-600"},
+        ].map(({d,t,c},i)=>(
+          <div key={i} className={`${c} leading-relaxed`} style={{paddingLeft:`${d*16}px`}}>{t}</div>
+        ))}
+      </DarkBlock>
+    </section>
+  );
+}
+
+function SectionBackend() {
+  return (
+    <section>
+      <Divider />
+      <H2 id="backend">Backend Architecture</H2>
+      <P>Layered Spring Boot application following Controller â†’ Service â†’ Repository pattern. Each domain has its own controller, service, and JPA repository.</P>
+
+      <H3>Controllers</H3>
+      <Table
+        head={["Controller", "Base Path", "Key Endpoints"]}
+        rows={[
+          ["MemberController",          "/api/members",          "register, login, forgot-password, CRUD"],
+          ["TrainerController",         "/api/trainers",         "register, login, CRUD"],
+          ["AdminController",           "/api/admin",            "register, login, CRUD"],
+          ["FitnessClassController",    "/api/fitness-classes",  "create, update, list, trainer filter"],
+          ["ClassBookingController",    "/api/bookings",         "book, cancel, attend, member/class views"],
+          ["BMIRecordController",       "/api/bmi",              "record, history, recent"],
+          ["WorkoutHistoryController",  "/api/workout-history",  "log, list by member, delete"],
+          ["DietPlanController",        "/api/diet-plans",       "create by trainer, list, update"],
+          ["MembershipPlanController",  "/api/membership-plans", "admin CRUD, deactivate"],
+          ["MemberMembershipController","/api/memberships",      "subscribe, cancel, active check"],
+          ["TransactionController",     "/api/transactions",     "record, list by member, list all"],
+          ["NotificationController",    "/api/notifications",    "create, list, mark-read, delete"],
+        ]}
+      />
+
+      <H3>Key Services</H3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6">
+        {[
+          ["BMIRecordService",    "Auto-calculates BMI from height/weight, categorizes as UNDERWEIGHT / NORMAL / OVERWEIGHT / OBESE"],
+          ["ClassBookingService", "Validates capacity before booking, manages BOOKED â†’ ATTENDED â†’ CANCELLED state machine"],
+          ["EmailService",       "Sends OTP via Spring Mail + Gmail SMTP; OTP expires after 10 minutes"],
+          ["MemberService",      "Login, password reset via OTP, profile update with optional image upload"],
+        ].map(([name, desc]) => (
+          <div key={name} className="border border-gray-200 rounded-xl p-3 bg-white">
+            <div className="font-mono text-[12px] font-semibold text-gray-800 mb-1">{name}</div>
+            <div className="text-[12px] text-gray-500 leading-relaxed">{desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <H3>Configuration</H3>
+      <Table
+        head={["Class", "Purpose"]}
+        rows={[
+          [<Code>CorsConfig</Code>,    "Allows all origins from localhost:5173, maps /api/**"],
+          [<Code>EmailConfig</Code>,   "Gmail SMTP via Spring Mail â€” host: smtp.gmail.com, port: 587"],
+          [<Code>FirebaseConfig</Code>,"Placeholder for future cloud storage integration"],
+        ]}
+      />
+
+      <H3>Critical Fix â€” @JsonIgnore on Lazy Relations</H3>
+      <P>All <Code>@ManyToOne(FetchType.LAZY)</Code> member/trainer fields had Jackson serialization failures outside a Hibernate session (<em>"could not initialize proxy â€” no Session"</em>). Fixed by adding <Code>@JsonIgnore</Code> to all lazy entity relationships.</P>
+      <DarkBlock>
+        <div className="text-gray-500 mb-2">{"// Applied to: BMIRecord, WorkoutHistory, DietPlan, Transaction, ClassBooking"}</div>
+        <div><span className="text-blue-400">@JsonIgnore</span></div>
+        <div><span className="text-blue-400">@ManyToOne</span><span className="text-gray-300">{"(fetch = FetchType.LAZY)"}</span></div>
+        <div><span className="text-blue-400">@JoinColumn</span><span className="text-gray-300">{"(name = \"member_id\")"}</span></div>
+        <div><span className="text-purple-400">private</span> <span className="text-emerald-400">Member</span> <span className="text-gray-300">member;</span></div>
+      </DarkBlock>
+    </section>
+  );
+}
+
+function SectionDatabase() {
+  const [open, setOpen] = useState(null);
+  const tables = [
+    {name:"members",           color:"bg-amber-500",  cols:["id PK","memberId UQ","username UQ","email UQ","password","firstName","lastName","phone","dob","age","gender","heightCm","weightKg","fitnessGoals","healthConditions","trainerPreference","imageUrl","otp","otpExpiry","createdAt","updatedAt"]},
+    {name:"trainers",          color:"bg-emerald-500",cols:["id PK","trainerId UQ","username UQ","email UQ","password","firstName","lastName","phone","specialization","certificationLevel","bio","imageUrl","otp","otpExpiry","createdAt","updatedAt"]},
+    {name:"admins",            color:"bg-rose-500",   cols:["id PK","adminId UQ","username UQ","email UQ","password","firstName","lastName","phone","createdAt","updatedAt"]},
+    {name:"membership_plans",  color:"bg-blue-500",   cols:["id PK","planName","planType","price","durationDays","description","isActive","createdAt"]},
+    {name:"member_memberships",color:"bg-indigo-500", cols:["id PK","member_id FK","plan_id FK","startDate","endDate","status","paymentStatus","createdAt"]},
+    {name:"fitness_classes",   color:"bg-teal-500",   cols:["id PK","className","classType","trainer_id FK","scheduledDay","scheduledTime","durationMinutes","capacity","currentEnrollment","description","isActive","createdAt","updatedAt"]},
+    {name:"class_bookings",    color:"bg-cyan-500",   cols:["id PK","member_id FK","fitness_class_id FK","bookingDate","status","createdAt"]},
+    {name:"bmi_records",       color:"bg-orange-500", cols:["id PK","member_id FK","heightCm","weightKg","bmi","category","recordDate","notes","createdAt"]},
+    {name:"workout_history",   color:"bg-yellow-600", cols:["id PK","member_id FK","trainer_id FK","workoutDate","exerciseName","sets","reps","weightKg","durationMinutes","notes","createdAt"]},
+    {name:"diet_plans",        color:"bg-lime-600",   cols:["id PK","member_id FK","trainer_id FK","planName","description","totalCalories","proteinGrams","carbsGrams","fatsGrams","createdAt","updatedAt"]},
+    {name:"transactions",      color:"bg-purple-500", cols:["id PK","member_id FK","transactionType","amount","description","transactionDate","paymentMethod","status","createdAt"]},
+    {name:"notifications",     color:"bg-gray-500",   cols:["id PK","title","message","recipientType","isRead","createdAt"]},
   ];
 
   const rels = [
-    "members 1 ──< member_memberships",
-    "membership_plans 1 ──< member_memberships",
-    "members 1 ──< class_bookings",
-    "fitness_classes 1 ──< class_bookings",
-    "trainers 1 ──< fitness_classes",
-    "members 1 ──< bmi_records",
-    "members 1 ──< workout_history",
-    "trainers 1 ──< workout_history (optional)",
-    "members 1 ──< diet_plans",
-    "trainers 1 ──< diet_plans (optional)",
-    "members 1 ──< transactions",
+    "members        1 â”€â”€â”€â”€â”€â”€< member_memberships",
+    "membership_plans 1 â”€â”€â”€â”€< member_memberships",
+    "members        1 â”€â”€â”€â”€â”€â”€< class_bookings",
+    "fitness_classes 1 â”€â”€â”€â”€â”€< class_bookings",
+    "trainers       1 â”€â”€â”€â”€â”€â”€< fitness_classes",
+    "members        1 â”€â”€â”€â”€â”€â”€< bmi_records",
+    "members        1 â”€â”€â”€â”€â”€â”€< workout_history",
+    "trainers       1 â”€â”€â”€â”€â”€â”€< workout_history  (nullable)",
+    "members        1 â”€â”€â”€â”€â”€â”€< diet_plans",
+    "trainers       1 â”€â”€â”€â”€â”€â”€< diet_plans       (nullable)",
+    "members        1 â”€â”€â”€â”€â”€â”€< transactions",
   ];
 
   return (
-    <section id="schema" className="mb-14 scroll-mt-16">
-      <SectionTitle icon={FiDatabase} title="Database Schema" sub="12 MySQL tables — click any table to expand columns" />
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 mb-5">
-        {entities.map(({ name, color, fields }) => (
-          <div key={name} className="rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm">
-            <button onClick={() => setExpanded(expanded === name ? null : name)}
-              className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 transition-colors text-left">
-              <div className={`w-2 h-2 rounded-full flex-shrink-0 ${color}`} />
-              <span className="text-[11px] font-semibold text-gray-700 font-mono truncate">{name}</span>
-              <span className="ml-auto text-gray-300 text-xs">{expanded === name ? "▲" : "▼"}</span>
+    <section>
+      <Divider />
+      <H2 id="database">Database Schema</H2>
+      <P>12 fully relational MySQL tables. Schema is managed by Hibernate DDL auto on startup. Click any table to expand columns.</P>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-6">
+        {tables.map(({name, color, cols}) => (
+          <div key={name} className="border border-gray-200 rounded-xl overflow-hidden bg-white">
+            <button onClick={() => setOpen(open===name ? null : name)}
+              className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left">
+              <span className={`w-2 h-2 rounded-full flex-shrink-0 ${color}`} />
+              <span className="text-[11px] font-mono font-semibold text-gray-700 truncate">{name}</span>
+              <span className="ml-auto text-gray-300 text-[10px]">{open===name ? "â–²" : "â–¼"}</span>
             </button>
-            {expanded === name && (
-              <div className="border-t border-gray-100 px-3 py-2 bg-gray-50 max-h-48 overflow-y-auto">
-                {fields.map((f) => (
-                  <div key={f} className="text-[11px] font-mono py-0.5 text-gray-600 flex items-center gap-1">
-                    {f.includes("PK")   && <FiKey  className="w-3 h-3 text-amber-500 flex-shrink-0" />}
-                    {f.includes("FK")   && <FiLink className="w-3 h-3 text-blue-400 flex-shrink-0" />}
-                    {f.includes("UQ")   && <FiStar className="w-3 h-3 text-emerald-500 flex-shrink-0" />}
-                    {f.includes("ENUM") && <FiList className="w-3 h-3 text-purple-400 flex-shrink-0" />}
-                    <span>{f.replace(" PK","").replace(/ FK.*$/,"").replace(" UQ","").replace(" ENUM","")}</span>
+            {open === name && (
+              <div className="border-t border-gray-100 bg-gray-50 px-3 py-2 max-h-52 overflow-y-auto">
+                {cols.map(col => (
+                  <div key={col} className="flex items-center gap-1.5 py-0.5">
+                    {col.includes("PK") && <span className="text-amber-500 text-[10px] font-bold flex-shrink-0">PK</span>}
+                    {col.includes("FK") && <span className="text-blue-400 text-[10px] font-bold flex-shrink-0">FK</span>}
+                    {col.includes("UQ") && <span className="text-emerald-500 text-[10px] font-bold flex-shrink-0">UQ</span>}
+                    {!col.includes("PK") && !col.includes("FK") && !col.includes("UQ") && <span className="w-5 flex-shrink-0" />}
+                    <span className="font-mono text-[11px] text-gray-600">{col.replace(/ (PK|FK|UQ)$/,"")}</span>
                   </div>
                 ))}
               </div>
@@ -677,261 +577,282 @@ function DatabaseSchema() {
           </div>
         ))}
       </div>
-      <div className="flex flex-wrap gap-4 mb-5 text-xs text-gray-400">
-        {[[FiKey,"text-amber-500","Primary Key"],[FiLink,"text-blue-400","Foreign Key"],[FiStar,"text-emerald-500","Unique"],[FiList,"text-purple-400","Enum"]].map(([Icon,cls,lbl]) => (
-          <span key={lbl} className="flex items-center gap-1"><Icon className={`w-3 h-3 ${cls}`} />{lbl}</span>
-        ))}
-      </div>
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-        <h3 className="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2"><FiLink className="text-blue-400" />Entity Relationships</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-          {rels.map((r) => (
-            <div key={r} className="text-[11px] font-mono text-gray-500 bg-gray-50 rounded-lg px-3 py-1.5">{r}</div>
-          ))}
-        </div>
-      </div>
+
+      <H3>Entity Relationships</H3>
+      <DarkBlock>
+        {rels.map(r => <div key={r} className="text-gray-300 font-mono text-[12px] leading-relaxed">{r}</div>)}
+      </DarkBlock>
     </section>
   );
 }
 
-// ─── 8. API Reference ─────────────────────────────────────────────────────────
+function SectionAPI() {
+  const [tab, setTab] = useState("auth");
+  const mColor = { GET:"blue", POST:"green", PUT:"amber", DELETE:"red" };
 
-function APIReference() {
-  const [open, setOpen] = useState("auth");
-  const groups = [
-    { id: "auth", label: "Authentication", endpoints: [
-      { method: "POST", path: "/api/members/register",         desc: "Register a new member (multipart/form-data)", role: "public" },
-      { method: "POST", path: "/api/members/login",            desc: "Member login → returns member JSON",          role: "public" },
-      { method: "POST", path: "/api/members/forgot-password",  desc: "Send OTP to member email",                   role: "public" },
-      { method: "POST", path: "/api/members/verify-otp",       desc: "Verify OTP for password reset",              role: "public" },
-      { method: "POST", path: "/api/members/reset-password",   desc: "Reset password with verified OTP",           role: "public" },
-      { method: "POST", path: "/api/trainers/register",        desc: "Register a new trainer",                     role: "public" },
-      { method: "POST", path: "/api/trainers/login",           desc: "Trainer login",                              role: "public" },
-      { method: "POST", path: "/api/admin/register",           desc: "Register a new admin",                       role: "public" },
-      { method: "POST", path: "/api/admin/login",              desc: "Admin login",                                role: "public" },
+  const groups = {
+    auth: { label:"Auth", rows:[
+      ["POST","/api/members/register",       "Register new member (multipart)",    "public"],
+      ["POST","/api/members/login",          "Member login",                       "public"],
+      ["POST","/api/members/forgot-password","Send OTP to email",                  "public"],
+      ["POST","/api/members/verify-otp",     "Verify OTP",                         "public"],
+      ["POST","/api/members/reset-password", "Reset password",                     "public"],
+      ["POST","/api/trainers/register",      "Register trainer",                   "public"],
+      ["POST","/api/trainers/login",         "Trainer login",                      "public"],
+      ["POST","/api/admin/register",         "Register admin",                     "public"],
+      ["POST","/api/admin/login",            "Admin login",                        "public"],
     ]},
-    { id: "members", label: "Members", endpoints: [
-      { method: "GET",    path: "/api/members",       desc: "Get all members",              role: "admin" },
-      { method: "GET",    path: "/api/members/{id}",  desc: "Get member by DB id",          role: "admin/member" },
-      { method: "PUT",    path: "/api/members/{id}",  desc: "Update member profile",        role: "member" },
-      { method: "DELETE", path: "/api/members/{id}",  desc: "Delete member account",        role: "admin" },
+    members: { label:"Members", rows:[
+      ["GET",   "/api/members",       "List all members",         "admin"],
+      ["GET",   "/api/members/{id}",  "Get member by id",         "admin/member"],
+      ["PUT",   "/api/members/{id}",  "Update member profile",    "member"],
+      ["DELETE","/api/members/{id}",  "Delete member",            "admin"],
     ]},
-    { id: "trainers", label: "Trainers", endpoints: [
-      { method: "GET",    path: "/api/trainers",        desc: "Get all trainers",            role: "admin" },
-      { method: "GET",    path: "/api/trainers/{id}",   desc: "Get trainer by id",           role: "all" },
-      { method: "PUT",    path: "/api/trainers/{id}",   desc: "Update trainer profile",      role: "trainer" },
-      { method: "DELETE", path: "/api/trainers/{id}",   desc: "Delete trainer account",      role: "admin" },
+    classes: { label:"Classes", rows:[
+      ["GET", "/api/fitness-classes",              "List all classes",             "all"],
+      ["POST","/api/fitness-classes",              "Create class",                 "trainer"],
+      ["PUT", "/api/fitness-classes/{id}",         "Update class",                 "trainer"],
+      ["GET", "/api/fitness-classes/trainer/{id}", "Trainer's own classes",        "trainer"],
+      ["POST","/api/bookings",                     "Book a class",                 "member"],
+      ["GET", "/api/bookings/member/{id}",         "Member's bookings",            "member"],
+      ["GET", "/api/bookings/class/{id}",          "Class attendees",              "trainer"],
+      ["PUT", "/api/bookings/{id}/cancel",         "Cancel booking",               "member"],
+      ["PUT", "/api/bookings/{id}/attend",         "Mark attended",                "trainer"],
     ]},
-    { id: "classes", label: "Classes & Bookings", endpoints: [
-      { method: "GET",  path: "/api/fitness-classes",                  desc: "Get all active classes",            role: "all" },
-      { method: "POST", path: "/api/fitness-classes",                  desc: "Create a class (multipart)",        role: "trainer/admin" },
-      { method: "PUT",  path: "/api/fitness-classes/{id}",             desc: "Update class",                      role: "trainer" },
-      { method: "GET",  path: "/api/fitness-classes/trainer/{id}",     desc: "Get trainer's own classes",         role: "trainer" },
-      { method: "POST", path: "/api/bookings",                         desc: "Book a class",                      role: "member" },
-      { method: "GET",  path: "/api/bookings/member/{memberId}",       desc: "Get member bookings",               role: "member" },
-      { method: "GET",  path: "/api/bookings/class/{classId}",         desc: "Get class attendees",               role: "trainer" },
-      { method: "PUT",  path: "/api/bookings/{id}/cancel",             desc: "Cancel booking",                    role: "member" },
-      { method: "PUT",  path: "/api/bookings/{id}/attend",             desc: "Mark attended",                     role: "trainer" },
+    health: { label:"Health", rows:[
+      ["POST",  "/api/bmi",                          "Record BMI entry",           "member"],
+      ["GET",   "/api/bmi/member/{id}",              "Full BMI history",           "member"],
+      ["GET",   "/api/bmi/member/{id}/recent",       "Last 5 records",             "member"],
+      ["POST",  "/api/workout-history",              "Log workout",                "member"],
+      ["GET",   "/api/workout-history/member/{id}",  "Member's workouts",          "member"],
+      ["DELETE","/api/workout-history/{id}",         "Delete workout",             "member"],
+      ["POST",  "/api/diet-plans",                   "Create diet plan",           "trainer"],
+      ["GET",   "/api/diet-plans/member/{id}",       "Member's diet plans",        "member/trainer"],
+      ["PUT",   "/api/diet-plans/{id}",              "Update diet plan",           "trainer"],
     ]},
-    { id: "health", label: "Health Tracking", endpoints: [
-      { method: "POST", path: "/api/bmi",                             desc: "Record new BMI entry",              role: "member" },
-      { method: "GET",  path: "/api/bmi/member/{memberId}",           desc: "Full BMI history",                  role: "member" },
-      { method: "GET",  path: "/api/bmi/member/{memberId}/recent",    desc: "Last 5 BMI records",                role: "member" },
-      { method: "POST", path: "/api/workout-history",                 desc: "Log a workout session",             role: "member" },
-      { method: "GET",  path: "/api/workout-history/member/{id}",     desc: "All workouts for member",           role: "member" },
-      { method: "DELETE",path: "/api/workout-history/{id}",           desc: "Delete workout entry",              role: "member" },
+    plans: { label:"Memberships", rows:[
+      ["GET", "/api/membership-plans",                   "List active plans",      "all"],
+      ["POST","/api/membership-plans",                   "Create plan",            "admin"],
+      ["PUT", "/api/membership-plans/{id}",              "Update plan",            "admin"],
+      ["PUT", "/api/membership-plans/{id}/deactivate",   "Deactivate plan",        "admin"],
+      ["POST","/api/memberships/subscribe",              "Subscribe to plan",      "member"],
+      ["GET", "/api/memberships/member/{id}",            "Member subscriptions",   "member"],
+      ["GET", "/api/memberships/active/{id}",            "Active membership",      "member"],
     ]},
-    { id: "plans", label: "Memberships & Diet", endpoints: [
-      { method: "GET",  path: "/api/membership-plans",                 desc: "Get active plans",                  role: "all" },
-      { method: "POST", path: "/api/membership-plans",                 desc: "Create plan",                       role: "admin" },
-      { method: "PUT",  path: "/api/membership-plans/{id}",            desc: "Update plan",                       role: "admin" },
-      { method: "PUT",  path: "/api/membership-plans/{id}/deactivate", desc: "Deactivate plan",                   role: "admin" },
-      { method: "POST", path: "/api/memberships/subscribe",            desc: "Subscribe member to a plan",        role: "member" },
-      { method: "GET",  path: "/api/memberships/member/{id}",          desc: "Get member's subscriptions",        role: "member" },
-      { method: "GET",  path: "/api/memberships/active/{id}",          desc: "Active membership",                 role: "member" },
-      { method: "POST", path: "/api/diet-plans",                       desc: "Create diet plan for member",       role: "trainer" },
-      { method: "GET",  path: "/api/diet-plans/member/{id}",           desc: "Get member's diet plans",           role: "member/trainer" },
-      { method: "PUT",  path: "/api/diet-plans/{id}",                  desc: "Update diet plan",                  role: "trainer" },
+    misc: { label:"Misc", rows:[
+      ["POST",  "/api/transactions",              "Record transaction",            "system"],
+      ["GET",   "/api/transactions/member/{id}",  "Member transactions",           "member"],
+      ["GET",   "/api/transactions",              "All transactions",              "admin"],
+      ["POST",  "/api/notifications",             "Create notification",           "admin"],
+      ["GET",   "/api/notifications",             "Get notifications",             "all"],
+      ["PUT",   "/api/notifications/{id}/read",   "Mark as read",                  "all"],
+      ["DELETE","/api/notifications/{id}",        "Delete notification",           "admin"],
     ]},
-    { id: "misc", label: "Transactions & Notifications", endpoints: [
-      { method: "POST", path: "/api/transactions",                     desc: "Record a transaction",              role: "system" },
-      { method: "GET",  path: "/api/transactions/member/{id}",         desc: "Member transaction history",        role: "member" },
-      { method: "GET",  path: "/api/transactions",                     desc: "All transactions",                  role: "admin" },
-      { method: "POST", path: "/api/notifications",                    desc: "Create notification",               role: "admin/system" },
-      { method: "GET",  path: "/api/notifications",                    desc: "Get notifications",                 role: "all" },
-      { method: "PUT",  path: "/api/notifications/{id}/read",          desc: "Mark as read",                      role: "all" },
-      { method: "DELETE",path: "/api/notifications/{id}",              desc: "Delete notification",               role: "admin" },
-    ]},
-  ];
-
-  const methodColor = { GET: "bg-blue-100 text-blue-700", POST: "bg-emerald-100 text-emerald-700", PUT: "bg-amber-100 text-amber-700", DELETE: "bg-red-100 text-red-600" };
-  const roleColor = { public: "green", admin: "rose", member: "amber", trainer: "green", all: "blue", "admin/member": "amber", "trainer/admin": "green", "member/trainer": "amber", "admin/system": "rose", system: "gray" };
-
-  return (
-    <section id="api" className="mb-14 scroll-mt-16">
-      <SectionTitle icon={FiCode} title="API Reference" sub="Base URL: http://localhost:8080/api — 40+ endpoints across 12 controllers" />
-      <div className="flex flex-wrap gap-2 mb-4">
-        {groups.map(({ id, label, endpoints }) => (
-          <button key={id} onClick={() => setOpen(id)}
-            className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${open === id ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-gray-400"}`}>
-            {label} <span className="opacity-50">({endpoints.length})</span>
-          </button>
-        ))}
-      </div>
-      {groups.filter(g => g.id === open).map(({ endpoints }) => (
-        <div key={open} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-          <table className="w-full text-xs">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-500 w-16">Method</th>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-500">Endpoint</th>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-500">Description</th>
-                <th className="px-4 py-2.5 text-left font-semibold text-gray-500 w-28">Access</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {endpoints.map(({ method, path, desc, role }, i) => (
-                <tr key={i} className={i % 2 === 1 ? "bg-gray-50/50" : ""}>
-                  <td className="px-4 py-2.5">
-                    <span className={`px-2 py-0.5 rounded font-bold font-mono ${methodColor[method]}`}>{method}</span>
-                  </td>
-                  <td className="px-4 py-2.5 font-mono text-gray-700">{path}</td>
-                  <td className="px-4 py-2.5 text-gray-500">{desc}</td>
-                  <td className="px-4 py-2.5">
-                    <Badge color={roleColor[role] || "gray"}>{role}</Badge>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ))}
-    </section>
-  );
-}
-
-// ─── 9. Tech Stack ────────────────────────────────────────────────────────────
-
-function TechStack() {
-  const stacks = [
-    { layer: "Frontend",  icon: FiMonitor, color: "blue",   bg: "bg-blue-500",
-      items: [
-        { name: "React 18",         note: "UI framework with hooks & Suspense" },
-        { name: "Vite 4",           note: "HMR dev server, fast ESM builds" },
-        { name: "Tailwind CSS 3",   note: "Utility-first styling" },
-        { name: "Redux Toolkit 2",  note: "State management, createSlice, createAsyncThunk" },
-        { name: "React Router 6",   note: "Client-side routing, lazy loading" },
-        { name: "Axios 1.7",        note: "HTTP client, API calls" },
-        { name: "React Icons 5",    note: "Feather icon set (FI*)" },
-        { name: "Material Tailwind",note: "UI component library" },
-        { name: "ApexCharts",       note: "Interactive charts" },
-      ]
-    },
-    { layer: "Backend",   icon: FiServer,  color: "emerald", bg: "bg-emerald-500",
-      items: [
-        { name: "Spring Boot 3.2",  note: "Auto-configuration, embedded Tomcat" },
-        { name: "Java 17",          note: "LTS release, records, sealed classes" },
-        { name: "Spring Data JPA",  note: "Repository abstraction, derived queries" },
-        { name: "Hibernate ORM",    note: "Entity mapping, lazy/eager loading" },
-        { name: "Maven",            note: "Build tool, dependency management" },
-        { name: "Lombok",           note: "@Data, @Builder — boilerplate reduction" },
-        { name: "Jackson",          note: "JSON serialization, @JsonIgnore" },
-        { name: "Spring Mail",      note: "Gmail SMTP for OTP emails" },
-        { name: "Spring DevTools",  note: "Hot reload during development" },
-      ]
-    },
-    { layer: "Database & Tools", icon: FiDatabase, color: "purple", bg: "bg-purple-500",
-      items: [
-        { name: "MySQL 8.0",        note: "Relational DB, XAMPP instance" },
-        { name: "JPA DDL auto",     note: "Schema created/updated on startup" },
-        { name: "H2 (test)",        note: "In-memory DB for unit tests" },
-        { name: "Git + GitHub",     note: "Version control, remote repo" },
-        { name: "XAMPP",            note: "Local Apache + MySQL server" },
-        { name: "Postman",          note: "API testing" },
-      ]
-    },
-  ];
-  const colorMap = {
-    blue:   { chip: "blue",  border: "border-blue-200", bg: "bg-blue-50" },
-    emerald:{ chip: "green", border: "border-emerald-200", bg: "bg-emerald-50" },
-    purple: { chip: "purple",border: "border-purple-200", bg: "bg-purple-50" },
   };
 
   return (
-    <section id="stack" className="mb-14 scroll-mt-16">
-      <SectionTitle icon={FiPackage} title="Technology Stack" sub="All libraries, frameworks, and tools used in the project" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {stacks.map(({ layer, icon: LI, color, bg, items }) => {
-          const c = colorMap[color];
-          return (
-            <div key={layer} className={`rounded-2xl border ${c.border} ${c.bg} overflow-hidden shadow-sm`}>
-              <div className="px-4 py-3 flex items-center gap-2 border-b border-white/50">
-                <div className={`w-7 h-7 rounded-lg ${bg} flex items-center justify-center`}>
-                  <LI className="w-4 h-4 text-white" />
-                </div>
-                <span className="font-bold text-gray-800 text-sm">{layer}</span>
-              </div>
-              <div className="p-3 flex flex-col gap-2">
-                {items.map(({ name, note }) => (
-                  <div key={name} className="bg-white/70 rounded-lg px-3 py-2 flex items-start gap-2">
-                    <span className="font-semibold text-gray-700 text-xs whitespace-nowrap">{name}</span>
-                    <span className="text-[11px] text-gray-400 leading-tight">{note}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
+    <section>
+      <Divider />
+      <H2 id="api">API Reference</H2>
+      <P>Base URL: <Code>http://localhost:8080/api</Code> Â· 40+ endpoints Â· No authentication headers required (session-based via localStorage).</P>
+
+      <div className="flex gap-1.5 flex-wrap mb-4">
+        {Object.entries(groups).map(([key, {label}]) => (
+          <button key={key} onClick={() => setTab(key)}
+            className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${tab===key ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="overflow-x-auto rounded-xl border border-gray-200">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide w-20">Method</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Endpoint</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Description</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide w-28">Access</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {groups[tab].rows.map(([method, path, desc, role], i) => (
+              <tr key={i} className="hover:bg-gray-50 transition-colors">
+                <td className="px-4 py-2.5"><Tag color={mColor[method]}>{method}</Tag></td>
+                <td className="px-4 py-2.5 font-mono text-[12px] text-gray-700">{path}</td>
+                <td className="px-4 py-2.5 text-gray-500 text-[13px]">{desc}</td>
+                <td className="px-4 py-2.5"><Tag color="gray">{role}</Tag></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </section>
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
+function SectionStack() {
+  const stacks = [
+    { layer:"Frontend",      color:"blue",   items:[
+      ["React 18",          "UI framework â€” hooks, Suspense, lazy"],
+      ["Vite 4",            "Build tool â€” HMR, fast ESM dev server"],
+      ["Tailwind CSS 3",    "Utility-first styling"],
+      ["Redux Toolkit 2",   "createSlice, createAsyncThunk, configureStore"],
+      ["React Router 6",    "Client-side routing, lazy loading, Outlet"],
+      ["Axios 1.7",         "HTTP client with base URL config"],
+      ["React Icons 5",     "Feather icon set (Fi*)"],
+      ["Material Tailwind", "Pre-built UI component library"],
+      ["ApexCharts",        "Interactive charts"],
+    ]},
+    { layer:"Backend",       color:"emerald", items:[
+      ["Spring Boot 3.2",   "Auto-config, embedded Tomcat, DevTools"],
+      ["Java 17",           "LTS â€” modern language features"],
+      ["Spring Data JPA",   "Repository abstraction, derived queries"],
+      ["Hibernate ORM",     "Entity mapping, lazy/eager loading"],
+      ["Maven",             "Build system, dependency management"],
+      ["Lombok",            "@Data @NoArgsConstructor â€” boilerplate"],
+      ["Jackson",           "JSON serialization, @JsonIgnore"],
+      ["Spring Mail",       "Gmail SMTP â€” OTP email delivery"],
+    ]},
+    { layer:"Database & Tools", color:"purple", items:[
+      ["MySQL 8.0",         "Relational DB â€” XAMPP local instance"],
+      ["JPA DDL auto",      "Schema auto-created/updated on startup"],
+      ["H2 (test scope)",   "In-memory DB for JUnit tests"],
+      ["Git + GitHub",      "Version control, remote at github.com/Sumeet138/kilojoules"],
+      ["XAMPP",             "Local Apache + MySQL environment"],
+    ]},
+  ];
+  const borderMap = { blue:"border-blue-200", emerald:"border-emerald-200", purple:"border-purple-200" };
+  const bgMap    = { blue:"bg-blue-50",     emerald:"bg-emerald-50",     purple:"bg-purple-50"     };
+  const dotMap   = { blue:"bg-blue-500",    emerald:"bg-emerald-500",    purple:"bg-purple-500"    };
+  const titleMap = { blue:"text-blue-700",  emerald:"text-emerald-700",  purple:"text-purple-700"  };
+
+  return (
+    <section>
+      <Divider />
+      <H2 id="stack">Tech Stack</H2>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {stacks.map(({layer, color, items}) => (
+          <div key={layer} className={`rounded-xl border ${borderMap[color]} ${bgMap[color]} overflow-hidden`}>
+            <div className={`px-4 py-3 border-b border-white/60 font-bold text-sm ${titleMap[color]}`}>{layer}</div>
+            <div className="p-3 space-y-1.5">
+              {items.map(([name, note]) => (
+                <div key={name} className="bg-white rounded-lg px-3 py-2 flex items-start gap-2">
+                  <span className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${dotMap[color]}`} />
+                  <div>
+                    <span className="text-[12px] font-semibold text-gray-800">{name}</span>
+                    <span className="text-[11px] text-gray-400 ml-1.5">{note}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// MAIN
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function SystemDesign() {
+  const [active, setActive] = useState("overview");
   const userRole = localStorage.getItem("userRole");
   const backLink = userRole ? `/dashboard/${userRole}/home` : "/auth";
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id); });
+      },
+      { rootMargin: "-20% 0px -70% 0px" }
+    );
+    TOC.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Sticky header */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-gray-200 px-6 py-3 flex items-center justify-between gap-4">
+    <div className="min-h-screen bg-white" style={{ fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}>
+
+      {/* â”€â”€ Top bar â”€â”€ */}
+      <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-white border-b border-gray-200 flex items-center px-6 gap-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center">
-            <FiCpu className="w-3.5 h-3.5 text-white" />
+          <div className="w-7 h-7 rounded-lg bg-orange-500 flex items-center justify-center flex-shrink-0">
+            <span className="text-white font-black text-sm leading-none">K</span>
           </div>
-          <span className="font-bold text-gray-900 text-sm">Kilojoules — System Design</span>
+          <span className="font-bold text-gray-900 text-sm">Kilojoules</span>
+          <span className="text-gray-300 text-sm">/</span>
+          <span className="text-gray-500 text-sm">System Design</span>
         </div>
-        <nav className="hidden lg:flex items-center gap-1">
-          {SECTIONS.map(({ id, label }) => (
-            <a key={id} href={`#${id}`}
-              className="text-xs text-gray-500 hover:text-gray-900 hover:bg-gray-100 px-2.5 py-1.5 rounded-lg transition-colors">
-              {label}
-            </a>
-          ))}
-        </nav>
-        <Link to={backLink}
-          className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-colors whitespace-nowrap">
-          ← Back to App
-        </Link>
+        <div className="ml-auto flex items-center gap-3">
+          <a href="https://github.com/Sumeet138/kilojoules" target="_blank" rel="noreferrer"
+            className="text-xs text-gray-500 hover:text-gray-800 transition-colors hidden sm:block">
+            GitHub â†—
+          </a>
+          <Link to={backLink}
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors">
+            â† Back to App
+          </Link>
+        </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-10">
-        <Overview />
-        <ArchFlow />
-        <RBAC />
-        <AuthFlow />
-        <FrontendArch />
-        <BackendArch />
-        <DatabaseSchema />
-        <APIReference />
-        <TechStack />
-      </main>
+      <div className="flex pt-14">
 
-      <footer className="border-t border-gray-200 text-center text-[11px] text-gray-400 py-5">
-        Kilojoules · React 18 + Spring Boot 3.2 + MySQL · Full-Stack Gym Management System
-      </footer>
+        {/* â”€â”€ Left sidebar â”€â”€ */}
+        <aside className="hidden lg:flex flex-col fixed top-14 left-0 bottom-0 w-56 border-r border-gray-200 bg-white overflow-y-auto">
+          <div className="p-5">
+            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">On this page</p>
+            <nav className="space-y-0.5">
+              {TOC.map(({ id, label }) => (
+                <a key={id} href={`#${id}`}
+                  onClick={() => setActive(id)}
+                  className={`block text-sm px-3 py-1.5 rounded-lg transition-colors ${
+                    active === id
+                      ? "bg-orange-50 text-orange-600 font-semibold"
+                      : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+                  }`}>
+                  {label}
+                </a>
+              ))}
+            </nav>
+          </div>
+        </aside>
+
+        {/* â”€â”€ Main content â”€â”€ */}
+        <main className="flex-1 lg:ml-56 min-w-0">
+          <div className="max-w-3xl mx-auto px-6 py-12 lg:py-16">
+
+            {/* Page title */}
+            <div className="mb-12">
+              <div className="text-xs font-semibold text-orange-500 uppercase tracking-widest mb-2">Documentation</div>
+              <h1 className="text-4xl font-extrabold text-gray-900 mb-3">System Design</h1>
+              <p className="text-gray-500 text-base">
+                Complete technical documentation for the Kilojoules Gym Management System â€” architecture, RBAC, auth flow, API reference, database schema, and tech stack.
+              </p>
+            </div>
+
+            <SectionOverview />
+            <SectionArchitecture />
+            <SectionRBAC />
+            <SectionAuthFlow />
+            <SectionFrontend />
+            <SectionBackend />
+            <SectionDatabase />
+            <SectionAPI />
+            <SectionStack />
+
+            <Divider />
+            <p className="text-center text-xs text-gray-400 pb-8">
+              Kilojoules Â· React 18 + Spring Boot 3.2 + MySQL Â· Built by Sumeet Sharma
+            </p>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
