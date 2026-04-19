@@ -1,5 +1,6 @@
 package com.gym.erp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gym.erp.entity.enums.PaymentMethod;
 import com.gym.erp.entity.enums.TransactionStatus;
 import com.gym.erp.entity.enums.TransactionType;
@@ -23,6 +24,7 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;

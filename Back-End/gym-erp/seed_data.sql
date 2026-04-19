@@ -162,5 +162,104 @@ VALUES
   ('Diet Plan Assigned',     'Your trainer has created a new diet plan for you. Check it out!',      'MEMBER',  0, NOW());
 
 -- ============================================================
+-- WORKOUT HISTORY FOR ARJUN (arjun_sharma)
+-- ============================================================
+INSERT IGNORE INTO workout_history (member_id, trainer_id, exercise_name, sets, reps, weight_kg, duration_minutes, workout_date, notes, created_at)
+SELECT m.id, t.id, 'Barbell Bench Press', 4, 10, 60.0, NULL, CURDATE() - INTERVAL 1 DAY, 'Good form, felt strong', NOW()
+FROM members m JOIN trainers t ON t.username = 'rohit_trainer' WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO workout_history (member_id, trainer_id, exercise_name, sets, reps, weight_kg, duration_minutes, workout_date, notes, created_at)
+SELECT m.id, t.id, 'Deadlift', 4, 6, 80.0, NULL, CURDATE() - INTERVAL 1 DAY, 'PR attempt next session', NOW()
+FROM members m JOIN trainers t ON t.username = 'rohit_trainer' WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO workout_history (member_id, trainer_id, exercise_name, sets, reps, weight_kg, duration_minutes, workout_date, notes, created_at)
+SELECT m.id, t.id, 'Pull-ups', 3, 12, NULL, NULL, CURDATE() - INTERVAL 2 DAY, 'Bodyweight - controlled reps', NOW()
+FROM members m JOIN trainers t ON t.username = 'rohit_trainer' WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO workout_history (member_id, trainer_id, exercise_name, sets, reps, weight_kg, duration_minutes, workout_date, notes, created_at)
+SELECT m.id, t.id, 'Squat', 5, 8, 70.0, NULL, CURDATE() - INTERVAL 3 DAY, 'Focusing on depth and form', NOW()
+FROM members m JOIN trainers t ON t.username = 'rohit_trainer' WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO workout_history (member_id, trainer_id, exercise_name, sets, reps, weight_kg, duration_minutes, workout_date, notes, created_at)
+SELECT m.id, t.id, 'Overhead Press', 3, 10, 40.0, NULL, CURDATE() - INTERVAL 3 DAY, 'Shoulder strength session', NOW()
+FROM members m JOIN trainers t ON t.username = 'rohit_trainer' WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO workout_history (member_id, trainer_id, exercise_name, sets, reps, weight_kg, duration_minutes, workout_date, notes, created_at)
+SELECT m.id, t.id, 'Treadmill Run', NULL, NULL, NULL, 30, CURDATE() - INTERVAL 4 DAY, 'Cardio warm-up, 6km/h', NOW()
+FROM members m JOIN trainers t ON t.username = 'rohit_trainer' WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO workout_history (member_id, trainer_id, exercise_name, sets, reps, weight_kg, duration_minutes, workout_date, notes, created_at)
+SELECT m.id, t.id, 'Dumbbell Curls', 3, 15, 12.0, NULL, CURDATE() - INTERVAL 5 DAY, 'Arm isolation day', NOW()
+FROM members m JOIN trainers t ON t.username = 'rohit_trainer' WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO workout_history (member_id, trainer_id, exercise_name, sets, reps, weight_kg, duration_minutes, workout_date, notes, created_at)
+SELECT m.id, t.id, 'Plank Hold', 3, NULL, NULL, 5, CURDATE() - INTERVAL 6 DAY, 'Core training - 60sec holds', NOW()
+FROM members m JOIN trainers t ON t.username = 'rohit_trainer' WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO workout_history (member_id, trainer_id, exercise_name, sets, reps, weight_kg, duration_minutes, workout_date, notes, created_at)
+SELECT m.id, t.id, 'Lat Pulldown', 4, 10, 50.0, NULL, CURDATE() - INTERVAL 7 DAY, 'Back width training', NOW()
+FROM members m JOIN trainers t ON t.username = 'rohit_trainer' WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO workout_history (member_id, trainer_id, exercise_name, sets, reps, weight_kg, duration_minutes, workout_date, notes, created_at)
+SELECT m.id, t.id, 'Leg Press', 4, 12, 100.0, NULL, CURDATE() - INTERVAL 8 DAY, 'High volume leg day', NOW()
+FROM members m JOIN trainers t ON t.username = 'rohit_trainer' WHERE m.username = 'arjun_sharma';
+
+-- ============================================================
+-- DIET PLANS FOR ARJUN (created by trainer Rohit)
+-- ============================================================
+INSERT IGNORE INTO diet_plans (member_id, trainer_id, plan_name, description, total_calories, protein_grams, carbs_grams, fats_grams, created_at)
+SELECT m.id, t.id,
+  'Muscle Gain Plan - Phase 1',
+  'High protein diet to support muscle gain and strength training. Breakfast: Oats with banana and whey protein. Mid-morning: Boiled eggs (4) + almonds. Lunch: Brown rice, grilled chicken (200g), dal, salad. Evening snack: Peanut butter toast + milk. Dinner: Roti (3), paneer/chicken curry, vegetables. Pre-bed: Casein or curd.',
+  2800, 180, 300, 80, NOW()
+FROM members m JOIN trainers t ON t.username = 'rohit_trainer' WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO diet_plans (member_id, trainer_id, plan_name, description, total_calories, protein_grams, carbs_grams, fats_grams, created_at)
+SELECT m.id, t.id,
+  'Lean Bulk - Phase 2',
+  'Calorie surplus plan for lean mass gain. Breakfast: 5 egg omelette with whole wheat toast. Snack: Greek yogurt + mixed nuts. Lunch: Quinoa, tuna/chicken 250g, sweet potato, greens. Pre-workout: Banana + whey shake. Post-workout: Rice + chicken. Dinner: Lentil soup, roti, stir-fried vegetables.',
+  3200, 210, 350, 90, DATE_ADD(NOW(), INTERVAL -7 DAY)
+FROM members m JOIN trainers t ON t.username = 'rohit_trainer' WHERE m.username = 'arjun_sharma';
+
+-- ============================================================
+-- CLASS BOOKINGS FOR ARJUN
+-- ============================================================
+INSERT IGNORE INTO class_bookings (member_id, fitness_class_id, booking_date, status, created_at)
+SELECT m.id, fc.id, CURDATE() - INTERVAL 2 DAY, 'ATTENDED', NOW()
+FROM members m JOIN fitness_classes fc ON fc.class_name = 'Power Lifting Bootcamp'
+WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO class_bookings (member_id, fitness_class_id, booking_date, status, created_at)
+SELECT m.id, fc.id, CURDATE() - INTERVAL 5 DAY, 'ATTENDED', NOW()
+FROM members m JOIN fitness_classes fc ON fc.class_name = 'CrossFit WOD'
+WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO class_bookings (member_id, fitness_class_id, booking_date, status, created_at)
+SELECT m.id, fc.id, CURDATE() - INTERVAL 8 DAY, 'ATTENDED', NOW()
+FROM members m JOIN fitness_classes fc ON fc.class_name = 'Power Lifting Bootcamp'
+WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO class_bookings (member_id, fitness_class_id, booking_date, status, created_at)
+SELECT m.id, fc.id, CURDATE(), 'BOOKED', NOW()
+FROM members m JOIN fitness_classes fc ON fc.class_name = 'Morning Yoga Flow'
+WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO class_bookings (member_id, fitness_class_id, booking_date, status, created_at)
+SELECT m.id, fc.id, DATE_ADD(CURDATE(), INTERVAL 2 DAY), 'BOOKED', NOW()
+FROM members m JOIN fitness_classes fc ON fc.class_name = 'CrossFit WOD'
+WHERE m.username = 'arjun_sharma';
+
+-- ============================================================
+-- ADDITIONAL BMI RECORDS FOR ARJUN (history)
+-- ============================================================
+INSERT IGNORE INTO bmi_records (member_id, height_cm, weight_kg, bmi, category, record_date, notes, created_at)
+SELECT m.id, 175.0, 74.0, ROUND(74.0/(1.75*1.75),2), 'NORMAL', CURDATE() - INTERVAL 30 DAY, 'Starting weight', NOW()
+FROM members m WHERE m.username = 'arjun_sharma';
+
+INSERT IGNORE INTO bmi_records (member_id, height_cm, weight_kg, bmi, category, record_date, notes, created_at)
+SELECT m.id, 175.0, 73.0, ROUND(73.0/(1.75*1.75),2), 'NORMAL', CURDATE() - INTERVAL 15 DAY, 'Good progress', NOW()
+FROM members m WHERE m.username = 'arjun_sharma';
+
+-- ============================================================
 SELECT '✅ Seed data inserted successfully!' AS Result;
 -- ============================================================
