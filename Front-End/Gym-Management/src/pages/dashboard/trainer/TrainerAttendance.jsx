@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Typography } from "@material-tailwind/react";
 import { fetchTrainerClasses } from "../../../store/slices/fitnessClassSlice";
-import { getClassBookings } from "../../../API/ApiStore";
+import { getClassBookings, markBookingAttended } from "../../../API/ApiStore";
 
 export default function TrainerAttendance() {
   const dispatch = useDispatch();
@@ -11,10 +11,24 @@ export default function TrainerAttendance() {
   const [selectedClass, setSelectedClass] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
+  const [markingId, setMarkingId] = useState(null);
 
   useEffect(() => {
     if (trainerId) dispatch(fetchTrainerClasses(trainerId));
   }, [dispatch, trainerId]);
+
+  const handleMarkAttended = async (bookingId) => {
+    setMarkingId(bookingId);
+    try {
+      await markBookingAttended(bookingId);
+      setBookings((prev) =>
+        prev.map((b) => (b.id === bookingId ? { ...b, status: "ATTENDED" } : b))
+      );
+    } catch {
+    } finally {
+      setMarkingId(null);
+    }
+  };
 
   const handleSelectClass = async (fc) => {
     setSelectedClass(fc);
@@ -86,16 +100,29 @@ export default function TrainerAttendance() {
             </div>
           ) : (
             <>
-              <Typography variant="h6" className="font-bold text-gym-text-primary mb-3">
-                {selectedClass.className} — {bookings.length} bookings
-              </Typography>
+              <div className="flex items-center justify-between mb-4">
+                <Typography variant="h6" className="font-bold text-gym-text-primary">
+                  {selectedClass.className}
+                </Typography>
+                <div className="flex gap-2 text-xs font-semibold">
+                  <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                    {bookings.filter(b => b.status === "BOOKED").length} Booked
+                  </span>
+                  <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                    {bookings.filter(b => b.status === "ATTENDED").length} Attended
+                  </span>
+                  <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                    {bookings.length} Total
+                  </span>
+                </div>
+              </div>
               {bookings.length === 0 ? (
                 <Typography className="text-gym-text-muted text-sm">No bookings for this class.</Typography>
               ) : (
                 <table className="w-full text-sm">
                   <thead className="bg-gym-beige">
                     <tr>
-                      {["Member", "Booking Date", "Status"].map((h) => (
+                      {["Member", "Booking Date", "Status", "Action"].map((h) => (
                         <th key={h} className="px-3 py-2 text-left font-semibold text-gym-text-secondary">{h}</th>
                       ))}
                     </tr>
@@ -111,6 +138,17 @@ export default function TrainerAttendance() {
                           <span className={`px-2 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[b.status] || ""}`}>
                             {b.status}
                           </span>
+                        </td>
+                        <td className="px-3 py-2">
+                          {b.status === "BOOKED" && (
+                            <button
+                              onClick={() => handleMarkAttended(b.id)}
+                              disabled={markingId === b.id}
+                              className="px-2.5 py-1 text-xs font-semibold bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors"
+                            >
+                              {markingId === b.id ? "…" : "Mark Attended"}
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}
