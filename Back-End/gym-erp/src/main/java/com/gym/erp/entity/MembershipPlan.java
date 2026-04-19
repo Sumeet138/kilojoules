@@ -1,5 +1,6 @@
 package com.gym.erp.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gym.erp.entity.enums.PlanType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -44,6 +45,7 @@ public class MembershipPlan {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @JsonProperty("isActive")
     @Column(nullable = false)
     private boolean isActive = true;
 
