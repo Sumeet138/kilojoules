@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Navigate } from "react-router-dom";
 import { Auth, Dashboard } from "./layouts";
-import ProtectedRoute from "./utils/ProtectedRoute.jsx";
+import ProtectedRoute, { GuestRoute } from "./utils/ProtectedRoute.jsx";
 
 // ---- Lazy auth pages ----
 const LoginTypeSelection = lazy(() =>
@@ -76,10 +76,13 @@ const S = (Component) => (
 );
 
 export const routes = [
-  // ---- Auth routes ----
+  // ---- Root redirect ----
+  { path: "/", element: <Navigate to="/auth" replace /> },
+
+  // ---- Auth routes (guest only) ----
   {
     path: "/auth",
-    element: <Auth />,
+    element: <GuestRoute><Auth /></GuestRoute>,
     children: [
       { index: true, element: S(LoginTypeSelection) },
       { path: "sign-up", element: S(SignUpTypeSelection) },

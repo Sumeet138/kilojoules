@@ -9,6 +9,8 @@ import {
 export function Sidenav({ brandImg, brandName, routes }) {
   const [controller, dispatch] = useMaterialTailwindController();
   const { sidenavColor, sidenavType, openSidenav } = controller;
+  const userRole = localStorage.getItem("userRole");
+  const homeLink = userRole ? `/dashboard/${userRole}/home` : "/auth";
 
   const sidenavTypes = {
     dark: "bg-gym-brown",
@@ -23,7 +25,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
       } fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border-0`}
     >
       <div className={`relative border-b ${sidenavType === "dark" ? "border-gym-warm/30" : "border-gym-beige-dark"}`}>
-        <Link to="/" className="flex items-center gap-4 py-6 px-8">
+        <Link to={homeLink} className="flex items-center gap-4 py-6 px-8">
           <img src={brandImg} alt="Kilojoules Logo" className="h-8 w-8" />
           <Typography
             variant="h6"

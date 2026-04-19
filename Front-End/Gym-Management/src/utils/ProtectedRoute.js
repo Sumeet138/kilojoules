@@ -4,10 +4,20 @@ export function ProtectedRoute({ children, allowedRole }) {
   const userRole = localStorage.getItem("userRole");
 
   if (!userRole) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/auth" replace />;
   }
 
   if (allowedRole && userRole !== allowedRole) {
+    return <Navigate to={`/dashboard/${userRole}/home`} replace />;
+  }
+
+  return children;
+}
+
+export function GuestRoute({ children }) {
+  const userRole = localStorage.getItem("userRole");
+
+  if (userRole) {
     return <Navigate to={`/dashboard/${userRole}/home`} replace />;
   }
 
