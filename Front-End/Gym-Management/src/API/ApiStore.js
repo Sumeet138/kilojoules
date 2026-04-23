@@ -173,6 +173,11 @@ export const getMemberTransactions = (memberId) =>
 
 export const getAllTransactions = () => api.get("/transactions");
 
+export const updateTransactionStatus = (id, status) =>
+  api.put(`/transactions/${id}/status?status=${status}`);
+
+export const deleteTransaction = (id) => api.delete(`/transactions/${id}`);
+
 // ===== NOTIFICATIONS =====
 export const createNotification = (data) => api.post("/notifications", data);
 

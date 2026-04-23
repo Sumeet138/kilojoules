@@ -2,6 +2,7 @@ package com.gym.erp.service;
 
 import com.gym.erp.entity.Member;
 import com.gym.erp.entity.Transaction;
+import com.gym.erp.entity.enums.TransactionStatus;
 import com.gym.erp.exception.ResourceNotFoundException;
 import com.gym.erp.repository.MemberRepository;
 import com.gym.erp.repository.TransactionRepository;
@@ -34,5 +35,19 @@ public class TransactionService {
 
     public List<Transaction> getAllTransactions() {
         return transactionRepository.findAll();
+    }
+
+    public Transaction updateTransactionStatus(Long id, TransactionStatus status) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with id: " + id));
+        transaction.setStatus(status);
+        return transactionRepository.save(transaction);
+    }
+
+    public void deleteTransaction(Long id) {
+        if (!transactionRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Transaction not found with id: " + id);
+        }
+        transactionRepository.deleteById(id);
     }
 }

@@ -2,6 +2,7 @@ package com.gym.erp.controller;
 
 import com.gym.erp.entity.Transaction;
 import com.gym.erp.entity.enums.PaymentMethod;
+import com.gym.erp.entity.enums.TransactionStatus;
 import com.gym.erp.entity.enums.TransactionType;
 import com.gym.erp.exception.ResourceNotFoundException;
 import com.gym.erp.service.TransactionService;
@@ -51,5 +52,27 @@ public class TransactionController {
     @GetMapping
     public List<Transaction> getAllTransactions() {
         return transactionService.getAllTransactions();
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam String status) {
+        try {
+            Transaction updated = transactionService.updateTransactionStatus(id, TransactionStatus.valueOf(status.toUpperCase()));
+            return ResponseEntity.ok(updated);
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body("Invalid status: " + status);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTransaction(@PathVariable Long id) {
+        try {
+            transactionService.deleteTransaction(id);
+            return ResponseEntity.noContent().build();
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
     }
 }
