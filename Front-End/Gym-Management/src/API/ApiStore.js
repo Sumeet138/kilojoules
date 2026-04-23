@@ -124,6 +124,13 @@ export const markBookingNoShow = (id) => api.put(`/bookings/${id}/no-show`);
 
 export const markBookingAttended = (id) => api.put(`/bookings/${id}/attend`);
 
+export const approveBooking = (id) => api.put(`/bookings/${id}/approve`);
+
+export const rejectBooking = (id, reason = "") =>
+  api.put(`/bookings/${id}/reject${reason ? `?reason=${encodeURIComponent(reason)}` : ""}`);
+
+export const getPendingBookings = () => api.get("/bookings/pending");
+
 // ===== BMI =====
 export const recordBMI = (memberId, heightCm, weightKg, notes = "") =>
   api.post(`/bmi?memberId=${memberId}&heightCm=${heightCm}&weightKg=${weightKg}&notes=${notes}`);

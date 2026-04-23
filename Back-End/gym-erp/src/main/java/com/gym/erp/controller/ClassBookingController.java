@@ -79,4 +79,35 @@ public class ClassBookingController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
         }
     }
+
+    @GetMapping("/pending")
+    public List<ClassBooking> getPendingBookings() {
+        return bookingService.getPendingBookings();
+    }
+
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<?> approveBooking(@PathVariable Long id) {
+        try {
+            ClassBooking booking = bookingService.approveBooking(id);
+            return ResponseEntity.ok(booking);
+        } catch (CustomException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<?> rejectBooking(
+            @PathVariable Long id,
+            @RequestParam(value = "reason", required = false) String reason) {
+        try {
+            ClassBooking booking = bookingService.rejectBooking(id, reason);
+            return ResponseEntity.ok(booking);
+        } catch (CustomException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
 }

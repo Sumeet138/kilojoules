@@ -1,14 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Typography, Alert } from "@material-tailwind/react";
 import { fetchMemberBookings, cancelBookingThunk } from "../../../store/slices/classBookingSlice";
-import { FiCalendar, FiX } from "react-icons/fi";
+import { FiCalendar, FiX, FiClock } from "react-icons/fi";
 
 const STATUS_STYLES = {
+  PENDING_APPROVAL: "bg-yellow-100 text-yellow-700",
   BOOKED:    "bg-blue-100 text-blue-700",
   ATTENDED:  "bg-green-100 text-green-700",
   CANCELLED: "bg-red-100 text-red-600",
   NO_SHOW:   "bg-gray-100 text-gray-600",
+};
+
+const STATUS_LABELS = {
+  PENDING_APPROVAL: "Awaiting Approval",
+  BOOKED:    "Approved",
+  ATTENDED:  "Attended",
+  CANCELLED: "Cancelled",
+  NO_SHOW:   "No Show",
 };
 
 export default function MyBookings() {
@@ -35,9 +44,18 @@ export default function MyBookings() {
     setTimeout(() => setMsg({ type: "", text: "" }), 4000);
   };
 
-  const booked   = bookings.filter((b) => b.status === "BOOKED").length;
-  const attended = bookings.filter((b) => b.status === "ATTENDED").length;
+  const pending   = bookings.filter((b) => b.status === "PENDING_APPROVAL").length;
+  const booked    = bookings.filter((b) => b.status === "BOOKED").length;
+  const attended  = bookings.filter((b) => b.status === "ATTENDED").length;
   const cancelled = bookings.filter((b) => b.status === "CANCELLED").length;
+
+  /* Auto-poll every 30s so status updates show without manual refresh */
+  const timerRef = useRef(null);
+  useEffect(() => {
+    if (!memberId) return;
+    timerRef.current = setInterval(() => dispatch(fetchMemberBookings(memberId)), 30000);
+    return () => clearInterval(timerRef.current);
+  }, [dispatch, memberId]);
 
   return (
     <div className="mt-4">
@@ -48,9 +66,10 @@ export default function MyBookings() {
 
       {/* Summary */}
       {bookings.length > 0 && (
-        <div className="grid grid-cols-3 gap-3 mb-5">
+        <div className="grid grid-cols-4 gap-3 mb-5">
           {[
-            { label: "Upcoming",  value: booked,    color: "bg-blue-50 border-blue-200 text-blue-700" },
+            { label: "Pending",   value: pending,   color: "bg-yellow-50 border-yellow-200 text-yellow-700" },
+            { label: "Approved",  value: booked,    color: "bg-blue-50 border-blue-200 text-blue-700" },
             { label: "Attended",  value: attended,  color: "bg-green-50 border-green-200 text-green-700" },
             { label: "Cancelled", value: cancelled, color: "bg-red-50 border-red-200 text-red-600" },
           ].map(({ label, value, color }) => (
@@ -100,19 +119,20 @@ export default function MyBookings() {
                     {b.fitnessClass?.price ? `\u20b9${b.fitnessClass.price}` : "\u2014"}
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[b.status] || ""}`}>
-                      {b.status}
+                    <span className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold w-fit ${STATUS_STYLES[b.status] || ""}`}>
+                      {b.status === "PENDING_APPROVAL" && <FiClock className="w-3 h-3" />}
+                      {STATUS_LABELS[b.status] || b.status}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    {b.status === "BOOKED" && (
+                    {(b.status === "PENDING_APPROVAL" || b.status === "BOOKED") && (
                       <button
                         onClick={() => handleCancel(b)}
                         disabled={cancellingId === b.id}
                         className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-red-500 border border-red-200 hover:bg-red-50 transition-colors disabled:opacity-40"
                       >
                         <FiX className="w-3 h-3" />
-                        {cancellingId === b.id ? "Cancelling…" : "Cancel"}
+                        {cancellingId === b.id ? "Revoking…" : b.status === "PENDING_APPROVAL" ? "Revoke" : "Cancel"}
                       </button>
                     )}
                   </td>

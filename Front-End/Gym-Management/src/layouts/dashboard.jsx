@@ -4,7 +4,7 @@ import { useMaterialTailwindController, setOpenSidenav } from "../context";
 import {
   FiHome, FiCalendar, FiList, FiFeather, FiActivity,
   FiTrendingUp, FiCreditCard, FiBell, FiUser, FiUsers,
-  FiCheckSquare, FiTag, FiBriefcase, FiGrid, FiLock,
+  FiCheckSquare, FiTag, FiBriefcase, FiGrid, FiLock, FiClipboard,
 } from "react-icons/fi";
 
 // Role-specific nav items
@@ -53,9 +53,10 @@ const adminRoutes = [
       { icon: FiBriefcase,  name: "Trainers",        path: "/trainers" },
       { icon: FiCalendar,   name: "Fitness Classes", path: "/classes" },
       { icon: FiTag,        name: "Memberships",     path: "/memberships" },
-      { icon: FiCreditCard, name: "Transactions",    path: "/transactions" },
-      { icon: FiBell,       name: "Notifications",   path: "/notifications" },
-      { icon: FiUser,       name: "Profile",         path: "/profile" },
+      { icon: FiCreditCard, name: "Transactions",       path: "/transactions" },
+      { icon: FiClipboard,  name: "Booking Approvals",   path: "/bookings" },
+      { icon: FiBell,       name: "Notifications",       path: "/notifications" },
+      { icon: FiUser,       name: "Profile",             path: "/profile" },
     ],
   },
 ];

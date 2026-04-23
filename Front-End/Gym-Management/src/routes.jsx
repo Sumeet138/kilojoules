@@ -63,6 +63,7 @@ const AdminMemberships = lazy(() => import("./pages/dashboard/admin/AdminMembers
 const AdminTransactions = lazy(() => import("./pages/dashboard/admin/AdminTransactions"));
 const AdminNotifications = lazy(() => import("./pages/dashboard/admin/AdminNotifications"));
 const AdminProfile = lazy(() => import("./pages/dashboard/admin/AdminProfile"));
+const AdminBookings = lazy(() => import("./pages/dashboard/admin/AdminBookings"));
 
 const Loader = () => (
   <div className="flex items-center justify-center h-64">
@@ -144,6 +145,7 @@ export const routes = [
       { path: "classes", element: S(AdminClasses) },
       { path: "memberships", element: S(AdminMemberships) },
       { path: "transactions", element: S(AdminTransactions) },
+      { path: "bookings", element: S(AdminBookings) },
       { path: "notifications", element: S(AdminNotifications) },
       { path: "profile", element: S(AdminProfile) },
     ],
