@@ -2,7 +2,9 @@ package com.gym.erp.service;
 
 import com.gym.erp.entity.DietPlan;
 import com.gym.erp.entity.Member;
+import com.gym.erp.entity.Notification;
 import com.gym.erp.entity.Trainer;
+import com.gym.erp.entity.enums.RecipientType;
 import com.gym.erp.exception.ResourceNotFoundException;
 import com.gym.erp.repository.DietPlanRepository;
 import com.gym.erp.repository.MemberRepository;
@@ -27,6 +29,9 @@ public class DietPlanService {
     @Autowired
     private TrainerRepository trainerRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public DietPlan createDietPlan(Long memberId, Long trainerId, DietPlan plan) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ResourceNotFoundException("Member not found with id: " + memberId));
@@ -37,7 +42,16 @@ public class DietPlanService {
             trainer.ifPresent(plan::setTrainer);
         }
 
-        return dietPlanRepository.save(plan);
+        DietPlan saved = dietPlanRepository.save(plan);
+
+        // Notify member about new diet plan
+        Notification notification = new Notification();
+        notification.setTitle("New Diet Plan Created");
+        notification.setMessage("Your trainer has created a new diet plan: " + plan.getPlanName() + " (" + plan.getTotalCalories() + " kcal).");
+        notification.setRecipientType(RecipientType.MEMBER);
+        notificationService.createNotification(notification);
+
+        return saved;
     }
 
     public List<DietPlan> getMemberDietPlans(Long memberId) {

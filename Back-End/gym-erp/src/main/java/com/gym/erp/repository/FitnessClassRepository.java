@@ -17,4 +17,6 @@ public interface FitnessClassRepository extends JpaRepository<FitnessClass, Long
     List<FitnessClass> findByTrainerId(Long trainerId);
 
     List<FitnessClass> findByIsActiveTrueAndClassType(ClassType classType);
+
+    List<FitnessClass> findByScheduledDay(String scheduledDay);
 }

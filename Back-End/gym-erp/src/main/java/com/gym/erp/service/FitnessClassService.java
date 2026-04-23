@@ -1,7 +1,10 @@
 package com.gym.erp.service;
 
 import com.gym.erp.entity.FitnessClass;
+import com.gym.erp.entity.Notification;
+import com.gym.erp.entity.Trainer;
 import com.gym.erp.entity.enums.ClassType;
+import com.gym.erp.entity.enums.RecipientType;
 import com.gym.erp.exception.ResourceNotFoundException;
 import com.gym.erp.repository.FitnessClassRepository;
 import com.gym.erp.repository.TrainerRepository;
@@ -21,8 +24,23 @@ public class FitnessClassService {
     @Autowired
     private TrainerRepository trainerRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public FitnessClass createClass(FitnessClass fitnessClass) {
-        return classRepository.save(fitnessClass);
+        FitnessClass saved = classRepository.save(fitnessClass);
+
+        // Notify assigned trainer
+        if (saved.getTrainer() != null) {
+            Trainer trainer = saved.getTrainer();
+            Notification notification = new Notification();
+            notification.setTitle("New Class Assigned");
+            notification.setMessage("You have been assigned to teach " + saved.getClassName() + " (" + saved.getScheduledDay() + " " + saved.getScheduledTime() + ").");
+            notification.setRecipientType(RecipientType.TRAINER);
+            notificationService.createNotification(notification);
+        }
+
+        return saved;
     }
 
     public List<FitnessClass> getAllActiveClasses() {

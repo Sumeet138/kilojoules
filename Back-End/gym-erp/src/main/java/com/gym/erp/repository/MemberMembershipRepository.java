@@ -5,6 +5,7 @@ import com.gym.erp.entity.enums.MembershipStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,4 +17,6 @@ public interface MemberMembershipRepository extends JpaRepository<MemberMembersh
     Optional<MemberMembership> findByMemberIdAndStatus(Long memberId, MembershipStatus status);
 
     boolean existsByMemberIdAndStatus(Long memberId, MembershipStatus status);
+
+    List<MemberMembership> findByEndDateAndStatus(LocalDate endDate, MembershipStatus status);
 }

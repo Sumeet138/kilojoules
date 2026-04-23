@@ -30,4 +30,6 @@ public interface ClassBookingRepository extends JpaRepository<ClassBooking, Long
     List<ClassBooking> findByFitnessClassIdAndBookingDateAndStatusNot(Long classId, LocalDate bookingDate, BookingStatus status);
 
     List<ClassBooking> findByFitnessClassIdAndStatusNot(Long classId, BookingStatus status);
+
+    List<ClassBooking> findByFitnessClassIdAndStatus(Long classId, BookingStatus status);
 }

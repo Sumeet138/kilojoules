@@ -165,7 +165,15 @@ public class ClassBookingService {
         ClassBooking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + bookingId));
         booking.setStatus(BookingStatus.ATTENDED);
-        return bookingRepository.save(booking);
+        ClassBooking saved = bookingRepository.save(booking);
+
+        // Notify member about attendance
+        FitnessClass fc = booking.getFitnessClass();
+        notify(RecipientType.MEMBER,
+                "Attendance Recorded ✅",
+                "You have been marked as attended for " + fc.getClassName() + " (" + fc.getScheduledDay() + " " + fc.getScheduledTime() + "). Keep up the great work!");
+
+        return saved;
     }
 
     public ClassBooking markNoShow(Long bookingId) {

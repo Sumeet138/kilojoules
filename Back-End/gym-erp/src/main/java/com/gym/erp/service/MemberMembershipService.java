@@ -3,7 +3,9 @@ package com.gym.erp.service;
 import com.gym.erp.entity.Member;
 import com.gym.erp.entity.MemberMembership;
 import com.gym.erp.entity.MembershipPlan;
+import com.gym.erp.entity.Notification;
 import com.gym.erp.entity.enums.MembershipStatus;
+import com.gym.erp.entity.enums.RecipientType;
 import com.gym.erp.exception.ResourceNotFoundException;
 import com.gym.erp.repository.MemberMembershipRepository;
 import com.gym.erp.repository.MemberRepository;
@@ -29,6 +31,9 @@ public class MemberMembershipService {
     @Autowired
     private MembershipPlanRepository planRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public MemberMembership subscribeToPlan(Long memberId, Long planId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ResourceNotFoundException("Member not found with id: " + memberId));
@@ -42,7 +47,16 @@ public class MemberMembershipService {
         membership.setEndDate(LocalDate.now().plusDays(plan.getDurationDays()));
         membership.setStatus(MembershipStatus.ACTIVE);
 
-        return membershipRepository.save(membership);
+        MemberMembership saved = membershipRepository.save(membership);
+
+        // Notify admin about new membership subscription
+        Notification notification = new Notification();
+        notification.setTitle("New Membership Subscription");
+        notification.setMessage(member.getFirstName() + " " + member.getLastName() + " has subscribed to " + plan.getPlanName() + " (₹" + plan.getPrice() + ").");
+        notification.setRecipientType(RecipientType.ADMIN);
+        notificationService.createNotification(notification);
+
+        return saved;
     }
 
     public List<MemberMembership> getMemberMemberships(Long memberId) {
