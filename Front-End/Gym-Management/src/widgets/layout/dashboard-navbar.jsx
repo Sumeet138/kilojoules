@@ -55,7 +55,7 @@ export function DashboardNavbar() {
             <Link to={`/${layout}/${role}`}>
               <Typography
                 variant="small"
-                color="inherit"
+                color="blue-gray"
                 className="font-normal opacity-50 transition-all hover:text-gym-warm hover:opacity-100 text-gym-text-secondary"
               >
                 {layout}
@@ -63,13 +63,13 @@ export function DashboardNavbar() {
             </Link>
             <Typography
               variant="small"
-              color="inherit"
+              color="blue-gray"
               className="font-normal text-gym-text-primary"
             >
               {page}
             </Typography>
           </Breadcrumbs>
-          <Typography variant="h6" color="inherit" className="font-bold text-gym-text-primary">
+          <Typography variant="h6" color="blue-gray" className="font-bold text-gym-text-primary">
             {page}
           </Typography>
         </div>
@@ -77,7 +77,7 @@ export function DashboardNavbar() {
           <div className="mr-auto md:mr-4"></div>
           <IconButton
             variant="text"
-            color="inherit"
+            color="blue-gray"
             className="grid xl:hidden text-gym-brown"
             onClick={() => setOpenSidenav(dispatch, !openSidenav)}
           >

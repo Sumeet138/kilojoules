@@ -94,8 +94,8 @@ function Table({ head, rows, className = "" }) {
 
 function Check({ yes }) {
   return yes
-    ? <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-600 text-[11px] font-bold">✓</span>
-    : <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-300 text-[11px]">—</span>;
+    ? <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-600 text-[11px] font-bold">{'\u2713'}</span>
+    : <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-300 text-[11px]">{'\u2014'}</span>;
 }
 
 // -----------------------------------------------------------------------------
@@ -176,7 +176,7 @@ function SectionArchitecture() {
             <div className="w-px h-4 bg-gray-300" />
             <span className="text-[10px] font-mono text-gray-400 bg-white border border-gray-200 px-2 py-0.5 rounded-full">HTTP / REST JSON · Axios · /api/*</span>
             <div className="w-px h-4 bg-gray-300" />
-            <span className="text-gray-300 text-xs">↓</span>
+            <span className="text-gray-300 text-xs">{'↓'}</span>
           </div>
         </div>
 
@@ -206,7 +206,7 @@ function SectionArchitecture() {
             <div className="w-px h-4 bg-gray-300" />
             <span className="text-[10px] font-mono text-gray-400 bg-white border border-gray-200 px-2 py-0.5 rounded-full">Hibernate ORM · JDBC · port 3306</span>
             <div className="w-px h-4 bg-gray-300" />
-            <span className="text-gray-300 text-xs">↓</span>
+            <span className="text-gray-300 text-xs">{'↓'}</span>
           </div>
         </div>
 
@@ -792,11 +792,11 @@ export default function SystemDesign() {
         <div className="ml-auto flex items-center gap-3">
           <a href="https://github.com/Sumeet138/kilojoules" target="_blank" rel="noreferrer"
             className="text-xs text-gray-500 hover:text-gray-800 transition-colors hidden sm:block">
-            GitHub ↗
+            GitHub {'↗'}
           </a>
           <Link to={backLink}
             className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors">
-            ← Back to App
+            {'←'} Back to App
           </Link>
         </div>
       </header>

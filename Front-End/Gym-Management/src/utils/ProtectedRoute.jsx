@@ -14,4 +14,14 @@ export function ProtectedRoute({ children, allowedRole }) {
   return children;
 }
 
+export function GuestRoute({ children }) {
+  const userRole = localStorage.getItem("userRole");
+
+  if (userRole) {
+    return <Navigate to={`/dashboard/${userRole}/home`} replace />;
+  }
+
+  return children;
+}
+
 export default ProtectedRoute;

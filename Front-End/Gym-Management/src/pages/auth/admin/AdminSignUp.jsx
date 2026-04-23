@@ -4,7 +4,6 @@ import { useDispatch } from "react-redux";
 import { Card, CardBody, Typography, Input, Button, Alert } from "@material-tailwind/react";
 import { registerAdminThunk } from "../../../store/slices/adminSlice";
 import { FiShield } from "react-icons/fi";
-import { AdminAutoFillButton } from "../../../components/TestAutoFillButton";
 
 const InputField = ({ label, name, type = "text", placeholder, value, onChange, required = true }) => (
   <div>
@@ -40,10 +39,6 @@ export function AdminSignUp() {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleAutoFill = (testData) => {
-    setForm(testData);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -73,10 +68,6 @@ export function AdminSignUp() {
       </div>
 
       {error && <Alert color="red" className="text-sm">{error}</Alert>}
-
-      <div className="flex justify-end">
-        <AdminAutoFillButton onFill={handleAutoFill} />
-      </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="md:col-span-2">

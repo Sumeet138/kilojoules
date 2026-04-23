@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, CardBody, Typography, Input, Button, Textarea, Alert } from "@material-tailwind/react";
 import { registerMember } from "../../../API/ApiStore";
-import { MemberAutoFillButton } from "../../../components/TestAutoFillButton";
 import { FiUser } from "react-icons/fi";
 
 const InputField = ({ label, name, type = "text", placeholder, value, onChange, required = true }) => (
@@ -48,10 +47,6 @@ export function MemberSignUp() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleAutoFill = (testData) => {
-    setForm(testData);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -81,10 +76,6 @@ export function MemberSignUp() {
       </div>
 
       {error && <Alert color="red" className="text-sm">{error}</Alert>}
-
-      <div className="flex justify-end">
-        <MemberAutoFillButton onFill={handleAutoFill} />
-      </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <InputField label="Member ID" name="memberId" placeholder="e.g. MEM001" value={form.memberId} onChange={handleChange} />
