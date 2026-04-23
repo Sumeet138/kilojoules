@@ -41,6 +41,7 @@ const MemberDietPlans = lazy(() => import("./pages/dashboard/member/MemberDietPl
 const WorkoutHistory = lazy(() => import("./pages/dashboard/member/WorkoutHistory"));
 const BMITracker = lazy(() => import("./pages/dashboard/member/BMITracker"));
 const MemberTransactions = lazy(() => import("./pages/dashboard/member/MemberTransactions"));
+const MemberMemberships = lazy(() => import("./pages/dashboard/member/MemberMemberships"));
 const MemberNotifications = lazy(() => import("./pages/dashboard/member/MemberNotifications"));
 const MemberProfile = lazy(() => import("./pages/dashboard/member/MemberProfile"));
 
@@ -108,6 +109,7 @@ export const routes = [
       { path: "book-classes", element: S(BookClasses) },
       { path: "bookings", element: S(MyBookings) },
       { path: "diet-plans", element: S(MemberDietPlans) },
+      { path: "memberships", element: S(MemberMemberships) },
       { path: "workouts", element: S(WorkoutHistory) },
       { path: "bmi", element: S(BMITracker) },
       { path: "transactions", element: S(MemberTransactions) },

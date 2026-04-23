@@ -16,6 +16,7 @@ const memberRoutes = [
       { icon: FiHome,       name: "Home",            path: "/home" },
       { icon: FiCalendar,   name: "Book Classes",    path: "/book-classes" },
       { icon: FiList,       name: "My Bookings",     path: "/bookings" },
+      { icon: FiTag,        name: "Membership",      path: "/memberships" },
       { icon: FiFeather,    name: "Diet Plans",      path: "/diet-plans" },
       { icon: FiActivity,   name: "Workout History", path: "/workouts" },
       { icon: FiTrendingUp, name: "BMI Tracker",     path: "/bmi" },
