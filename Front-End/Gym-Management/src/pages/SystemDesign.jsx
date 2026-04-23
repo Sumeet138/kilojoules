@@ -1,9 +1,9 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -----------------------------------------------------------------------------
 // DATA
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -----------------------------------------------------------------------------
 
 const TOC = [
   { id: "overview",    label: "Overview" },
@@ -17,9 +17,9 @@ const TOC = [
   { id: "stack",       label: "Tech Stack" },
 ];
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -----------------------------------------------------------------------------
 // SMALL HELPERS
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -----------------------------------------------------------------------------
 
 function Tag({ children, color = "gray" }) {
   const c = {
@@ -94,25 +94,25 @@ function Table({ head, rows, className = "" }) {
 
 function Check({ yes }) {
   return yes
-    ? <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-600 text-[11px] font-bold">âœ“</span>
-    : <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-300 text-[11px]">â€“</span>;
+    ? <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-600 text-[11px] font-bold">✓</span>
+    : <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-300 text-[11px]">—</span>;
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -----------------------------------------------------------------------------
 // SECTIONS
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -----------------------------------------------------------------------------
 
 function SectionOverview() {
   return (
     <section>
       <H2 id="overview">Overview</H2>
       <p className="text-sm text-gray-500 leading-relaxed mb-6">
-        <strong className="text-gray-800">Kilojoules</strong> is a full-stack gym management system that connects three user roles â€” Members, Trainers, and Admins â€” through a React SPA, a Spring Boot REST API, and a MySQL relational database.
+        <strong className="text-gray-800">Kilojoules</strong> is a full-stack gym management system that connects three user roles — Members, Trainers, and Admins — through a React SPA, a Spring Boot REST API, and a MySQL relational database.
       </p>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
         {[
-          ["3",   "User Roles",       "Member Â· Trainer Â· Admin"],
+          ["3",   "User Roles",       "Member · Trainer · Admin"],
           ["40+", "REST Endpoints",   "Across 12 controllers"],
           ["12",  "Database Tables",  "Relational MySQL schema"],
           ["24+", "Frontend Pages",   "Lazy-loaded components"],
@@ -154,13 +154,13 @@ function SectionArchitecture() {
     <section>
       <Divider />
       <H2 id="architecture">System Architecture</H2>
-      <P>Three-tier architecture â€” Presentation (React SPA) â†’ Business Logic (Spring Boot) â†’ Data (MySQL).</P>
+      <P>Three-tier architecture — Presentation (React SPA) → Business Logic (Spring Boot) → Data (MySQL).</P>
 
       <div className="space-y-3 mb-8">
         {/* Tier 1 */}
         <div className="border border-blue-200 bg-blue-50 rounded-xl p-4">
           <div className="flex items-center gap-3 mb-3">
-            <span className="text-xs font-bold text-blue-500 uppercase tracking-widest">Tier 1 â€” Presentation</span>
+            <span className="text-xs font-bold text-blue-500 uppercase tracking-widest">Tier 1 — Presentation</span>
             <span className="ml-auto font-mono text-[11px] text-blue-400">localhost:5173</span>
           </div>
           <div className="font-semibold text-blue-900 text-sm mb-2">React 18 SPA</div>
@@ -174,16 +174,16 @@ function SectionArchitecture() {
         <div className="flex justify-center">
           <div className="flex flex-col items-center gap-1 py-1">
             <div className="w-px h-4 bg-gray-300" />
-            <span className="text-[10px] font-mono text-gray-400 bg-white border border-gray-200 px-2 py-0.5 rounded-full">HTTP / REST JSON Â· Axios Â· /api/*</span>
+            <span className="text-[10px] font-mono text-gray-400 bg-white border border-gray-200 px-2 py-0.5 rounded-full">HTTP / REST JSON · Axios · /api/*</span>
             <div className="w-px h-4 bg-gray-300" />
-            <span className="text-gray-300 text-xs">â†“</span>
+            <span className="text-gray-300 text-xs">↓</span>
           </div>
         </div>
 
         {/* Tier 2 */}
         <div className="border border-emerald-200 bg-emerald-50 rounded-xl p-4">
           <div className="flex items-center gap-3 mb-3">
-            <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Tier 2 â€” Business Logic</span>
+            <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Tier 2 — Business Logic</span>
             <span className="ml-auto font-mono text-[11px] text-emerald-500">localhost:8080</span>
           </div>
           <div className="font-semibold text-emerald-900 text-sm mb-2">Spring Boot 3.2 REST API</div>
@@ -191,7 +191,7 @@ function SectionArchitecture() {
             {[
               ["Controllers (12)", "Route mapping, request validation, HTTP responses"],
               ["Services (13)", "Business rules, BMI calc, capacity checks, OTP"],
-              ["Repositories (12)", "Spring Data JPA â€” CRUD + custom queries"],
+              ["Repositories (12)", "Spring Data JPA — CRUD + custom queries"],
             ].map(([name, note]) => (
               <div key={name} className="bg-white rounded-lg p-2.5 border border-emerald-100">
                 <div className="font-semibold text-emerald-800">{name}</div>
@@ -204,16 +204,16 @@ function SectionArchitecture() {
         <div className="flex justify-center">
           <div className="flex flex-col items-center gap-1 py-1">
             <div className="w-px h-4 bg-gray-300" />
-            <span className="text-[10px] font-mono text-gray-400 bg-white border border-gray-200 px-2 py-0.5 rounded-full">Hibernate ORM Â· JDBC Â· port 3306</span>
+            <span className="text-[10px] font-mono text-gray-400 bg-white border border-gray-200 px-2 py-0.5 rounded-full">Hibernate ORM · JDBC · port 3306</span>
             <div className="w-px h-4 bg-gray-300" />
-            <span className="text-gray-300 text-xs">â†“</span>
+            <span className="text-gray-300 text-xs">↓</span>
           </div>
         </div>
 
         {/* Tier 3 */}
         <div className="border border-purple-200 bg-purple-50 rounded-xl p-4">
           <div className="flex items-center gap-3 mb-3">
-            <span className="text-xs font-bold text-purple-500 uppercase tracking-widest">Tier 3 â€” Data</span>
+            <span className="text-xs font-bold text-purple-500 uppercase tracking-widest">Tier 3 — Data</span>
             <span className="ml-auto font-mono text-[11px] text-purple-400">schema: gym</span>
           </div>
           <div className="font-semibold text-purple-900 text-sm mb-2">MySQL 8 Database</div>
@@ -329,9 +329,9 @@ function SectionAuthFlow() {
         {[
           ["1", "User submits credentials",              "username + password on sign-in form"],
           ["2", "Redux async thunk dispatched",          "loginMemberThunk / loginTrainerThunk / loginAdminThunk"],
-          ["3", "POST to Spring Boot API",               "/api/{role}/login â€” returns full user JSON"],
+          ["3", "POST to Spring Boot API",               "/api/{role}/login — returns full user JSON"],
           ["4", "Redux state updated",                   "currentMember / currentTrainer / currentAdmin"],
-          ["5", "localStorage populated",               "memberId  Â·  memberData  Â·  userRole"],
+          ["5", "localStorage populated",               "memberId  ·  memberData  ·  userRole"],
           ["6", "React Router navigates",               "/dashboard/{role}/home via useNavigate"],
         ].map(([n, label, detail], i, arr) => (
           <div key={n} className="flex gap-3">
@@ -352,21 +352,21 @@ function SectionAuthFlow() {
       <DarkBlock>
         <div className="text-gray-500 mb-2">{"// utils/ProtectedRoute.js"}</div>
         <div><span className="text-purple-400">if</span> <span className="text-gray-300">(!userRole)</span></div>
-        <div className="pl-4 text-gray-400">{"â†’ "}<span className="text-blue-400">{"<Navigate to='/auth' replace />"}</span></div>
+        <div className="pl-4 text-gray-400">{"→ "}<span className="text-blue-400">{"<Navigate to='/auth' replace />"}</span></div>
         <div><span className="text-purple-400">if</span> <span className="text-gray-300">(userRole !== allowedRole)</span></div>
-        <div className="pl-4 text-gray-400">{"â†’ "}<span className="text-blue-400">{"<Navigate to='/dashboard/{role}/home' replace />"}</span></div>
+        <div className="pl-4 text-gray-400">{"→ "}<span className="text-blue-400">{"<Navigate to='/dashboard/{role}/home' replace />"}</span></div>
         <div><span className="text-purple-400">else</span></div>
-        <div className="pl-4 text-emerald-400">{"â†’ render children âœ“"}</div>
+        <div className="pl-4 text-emerald-400">{"→ render children ✓"}</div>
       </DarkBlock>
 
       <H3>GuestRoute</H3>
       <P>Wraps the entire <Code>/auth</Code> layout. Redirects logged-in users away from sign-in/sign-up pages.</P>
       <DarkBlock>
-        <div className="text-gray-500 mb-2">{"// utils/ProtectedRoute.js â€” GuestRoute"}</div>
+        <div className="text-gray-500 mb-2">{"// utils/ProtectedRoute.js — GuestRoute"}</div>
         <div><span className="text-purple-400">if</span> <span className="text-gray-300">(userRole exists)</span></div>
-        <div className="pl-4 text-gray-400">{"â†’ "}<span className="text-blue-400">{"<Navigate to='/dashboard/{role}/home' replace />"}</span></div>
+        <div className="pl-4 text-gray-400">{"→ "}<span className="text-blue-400">{"<Navigate to='/dashboard/{role}/home' replace />"}</span></div>
         <div><span className="text-purple-400">else</span></div>
-        <div className="pl-4 text-emerald-400">{"â†’ render auth page âœ“"}</div>
+        <div className="pl-4 text-emerald-400">{"→ render auth page ✓"}</div>
       </DarkBlock>
 
       <H3>localStorage Session Keys</H3>
@@ -393,26 +393,26 @@ function SectionFrontend() {
       <DarkBlock>
         {[
           {d:0, t:"/",                                  c:"text-gray-500"},
-          {d:1, t:"â†’ /auth  [GuestRoute + Auth layout]", c:"text-blue-400"},
+          {d:1, t:"→ /auth  [GuestRoute + Auth layout]", c:"text-blue-400"},
           {d:2, t:"index  LoginTypeSelection",          c:"text-gray-400"},
           {d:2, t:"member/sign-in   member/sign-up",    c:"text-gray-400"},
           {d:2, t:"trainer/sign-in  trainer/sign-up",   c:"text-gray-400"},
           {d:2, t:"admin/sign-in    admin/sign-up",     c:"text-gray-400"},
           {d:2, t:"forgot-password",                    c:"text-gray-400"},
-          {d:1, t:"â†’ /dashboard/member  [ProtectedRoute, role=member]", c:"text-amber-400"},
+          {d:1, t:"→ /dashboard/member  [ProtectedRoute, role=member]", c:"text-amber-400"},
           {d:2, t:"home  book-classes  bookings  bmi  workouts  diet-plans  transactions  notifications  profile", c:"text-gray-400"},
-          {d:1, t:"â†’ /dashboard/trainer [ProtectedRoute, role=trainer]", c:"text-emerald-400"},
+          {d:1, t:"→ /dashboard/trainer [ProtectedRoute, role=trainer]", c:"text-emerald-400"},
           {d:2, t:"home  classes  attendance  diet-plans  members  notifications  profile", c:"text-gray-400"},
-          {d:1, t:"â†’ /dashboard/admin  [ProtectedRoute, role=admin]",   c:"text-rose-400"},
+          {d:1, t:"→ /dashboard/admin  [ProtectedRoute, role=admin]",   c:"text-rose-400"},
           {d:2, t:"home  members  trainers  classes  memberships  transactions  notifications  profile", c:"text-gray-400"},
-          {d:1, t:"â†’ /system-design",                  c:"text-purple-400"},
-          {d:1, t:"â†’ *  â†’  /auth  (fallback)",         c:"text-gray-600"},
+          {d:1, t:"→ /system-design",                  c:"text-purple-400"},
+          {d:1, t:"→ *  →  /auth  (fallback)",         c:"text-gray-600"},
         ].map(({d,t,c},i)=>(
           <div key={i} className={`${c} leading-relaxed`} style={{paddingLeft:`${d*16}px`}}>{t}</div>
         ))}
       </DarkBlock>
 
-      <H3>Redux Store â€” 11 Slices</H3>
+      <H3>Redux Store — 11 Slices</H3>
       <Table
         head={["Slice", "State", "Thunks"]}
         rows={[
@@ -437,12 +437,12 @@ function SectionFrontend() {
           {d:1,t:"<Provider store={store}>",             c:"text-purple-400"},
           {d:2,t:"<RouterProvider>",                     c:"text-blue-400"},
           {d:3,t:"Auth layout  (split-screen hero + form panel)", c:"text-blue-300"},
-          {d:4,t:"<Outlet>  â†’  SignIn / SignUp / Forgot", c:"text-gray-400"},
+          {d:4,t:"<Outlet>  →  SignIn / SignUp / Forgot", c:"text-gray-400"},
           {d:3,t:"Dashboard layout  (sidenav + navbar + outlet)", c:"text-amber-400"},
-          {d:4,t:"<Sidenav>  logo â†’ role home Â· nav links", c:"text-gray-400"},
-          {d:4,t:"<DashboardNavbar>  breadcrumbs Â· profile", c:"text-gray-400"},
-          {d:4,t:"<Outlet>  â†’  page content",            c:"text-gray-400"},
-          {d:5,t:"StatisticsCard Â· Charts Â· Tables",     c:"text-gray-600"},
+          {d:4,t:"<Sidenav>  logo → role home · nav links", c:"text-gray-400"},
+          {d:4,t:"<DashboardNavbar>  breadcrumbs · profile", c:"text-gray-400"},
+          {d:4,t:"<Outlet>  →  page content",            c:"text-gray-400"},
+          {d:5,t:"StatisticsCard · Charts · Tables",     c:"text-gray-600"},
         ].map(({d,t,c},i)=>(
           <div key={i} className={`${c} leading-relaxed`} style={{paddingLeft:`${d*16}px`}}>{t}</div>
         ))}
@@ -456,7 +456,7 @@ function SectionBackend() {
     <section>
       <Divider />
       <H2 id="backend">Backend Architecture</H2>
-      <P>Layered Spring Boot application following Controller â†’ Service â†’ Repository pattern. Each domain has its own controller, service, and JPA repository.</P>
+      <P>Layered Spring Boot application following Controller → Service → Repository pattern. Each domain has its own controller, service, and JPA repository.</P>
 
       <H3>Controllers</H3>
       <Table
@@ -481,7 +481,7 @@ function SectionBackend() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6">
         {[
           ["BMIRecordService",    "Auto-calculates BMI from height/weight, categorizes as UNDERWEIGHT / NORMAL / OVERWEIGHT / OBESE"],
-          ["ClassBookingService", "Validates capacity before booking, manages BOOKED â†’ ATTENDED â†’ CANCELLED state machine"],
+          ["ClassBookingService", "Validates capacity before booking, manages BOOKED → ATTENDED → CANCELLED state machine"],
           ["EmailService",       "Sends OTP via Spring Mail + Gmail SMTP; OTP expires after 10 minutes"],
           ["MemberService",      "Login, password reset via OTP, profile update with optional image upload"],
         ].map(([name, desc]) => (
@@ -497,13 +497,13 @@ function SectionBackend() {
         head={["Class", "Purpose"]}
         rows={[
           [<Code>CorsConfig</Code>,    "Allows all origins from localhost:5173, maps /api/**"],
-          [<Code>EmailConfig</Code>,   "Gmail SMTP via Spring Mail â€” host: smtp.gmail.com, port: 587"],
+          [<Code>EmailConfig</Code>,   "Gmail SMTP via Spring Mail — host: smtp.gmail.com, port: 587"],
           [<Code>FirebaseConfig</Code>,"Placeholder for future cloud storage integration"],
         ]}
       />
 
-      <H3>Critical Fix â€” @JsonIgnore on Lazy Relations</H3>
-      <P>All <Code>@ManyToOne(FetchType.LAZY)</Code> member/trainer fields had Jackson serialization failures outside a Hibernate session (<em>"could not initialize proxy â€” no Session"</em>). Fixed by adding <Code>@JsonIgnore</Code> to all lazy entity relationships.</P>
+      <H3>Critical Fix — @JsonIgnore on Lazy Relations</H3>
+      <P>All <Code>@ManyToOne(FetchType.LAZY)</Code> member/trainer fields had Jackson serialization failures outside a Hibernate session (<em>"could not initialize proxy — no Session"</em>). Fixed by adding <Code>@JsonIgnore</Code> to all lazy entity relationships.</P>
       <DarkBlock>
         <div className="text-gray-500 mb-2">{"// Applied to: BMIRecord, WorkoutHistory, DietPlan, Transaction, ClassBooking"}</div>
         <div><span className="text-blue-400">@JsonIgnore</span></div>
@@ -533,17 +533,17 @@ function SectionDatabase() {
   ];
 
   const rels = [
-    "members        1 â”€â”€â”€â”€â”€â”€< member_memberships",
-    "membership_plans 1 â”€â”€â”€â”€< member_memberships",
-    "members        1 â”€â”€â”€â”€â”€â”€< class_bookings",
-    "fitness_classes 1 â”€â”€â”€â”€â”€< class_bookings",
-    "trainers       1 â”€â”€â”€â”€â”€â”€< fitness_classes",
-    "members        1 â”€â”€â”€â”€â”€â”€< bmi_records",
-    "members        1 â”€â”€â”€â”€â”€â”€< workout_history",
-    "trainers       1 â”€â”€â”€â”€â”€â”€< workout_history  (nullable)",
-    "members        1 â”€â”€â”€â”€â”€â”€< diet_plans",
-    "trainers       1 â”€â”€â”€â”€â”€â”€< diet_plans       (nullable)",
-    "members        1 â”€â”€â”€â”€â”€â”€< transactions",
+    "members        1 —————< member_memberships",
+    "membership_plans 1 ———< member_memberships",
+    "members        1 —————< class_bookings",
+    "fitness_classes 1 ————< class_bookings",
+    "trainers       1 —————< fitness_classes",
+    "members        1 —————< bmi_records",
+    "members        1 —————< workout_history",
+    "trainers       1 —————< workout_history  (nullable)",
+    "members        1 —————< diet_plans",
+    "trainers       1 —————< diet_plans       (nullable)",
+    "members        1 —————< transactions",
   ];
 
   return (
@@ -559,7 +559,7 @@ function SectionDatabase() {
               className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left">
               <span className={`w-2 h-2 rounded-full flex-shrink-0 ${color}`} />
               <span className="text-[11px] font-mono font-semibold text-gray-700 truncate">{name}</span>
-              <span className="ml-auto text-gray-300 text-[10px]">{open===name ? "â–²" : "â–¼"}</span>
+              <span className="ml-auto text-gray-300 text-[10px]">{open===name ? "▲" : "▼"}</span>
             </button>
             {open === name && (
               <div className="border-t border-gray-100 bg-gray-50 px-3 py-2 max-h-52 overflow-y-auto">
@@ -654,7 +654,7 @@ function SectionAPI() {
     <section>
       <Divider />
       <H2 id="api">API Reference</H2>
-      <P>Base URL: <Code>http://localhost:8080/api</Code> Â· 40+ endpoints Â· No authentication headers required (session-based via localStorage).</P>
+      <P>Base URL: <Code>http://localhost:8080/api</Code> · 40+ endpoints · No authentication headers required (session-based via localStorage).</P>
 
       <div className="flex gap-1.5 flex-wrap mb-4">
         {Object.entries(groups).map(([key, {label}]) => (
@@ -694,8 +694,8 @@ function SectionAPI() {
 function SectionStack() {
   const stacks = [
     { layer:"Frontend",      color:"blue",   items:[
-      ["React 18",          "UI framework â€” hooks, Suspense, lazy"],
-      ["Vite 4",            "Build tool â€” HMR, fast ESM dev server"],
+      ["React 18",          "UI framework — hooks, Suspense, lazy"],
+      ["Vite 4",            "Build tool — HMR, fast ESM dev server"],
       ["Tailwind CSS 3",    "Utility-first styling"],
       ["Redux Toolkit 2",   "createSlice, createAsyncThunk, configureStore"],
       ["React Router 6",    "Client-side routing, lazy loading, Outlet"],
@@ -706,16 +706,16 @@ function SectionStack() {
     ]},
     { layer:"Backend",       color:"emerald", items:[
       ["Spring Boot 3.2",   "Auto-config, embedded Tomcat, DevTools"],
-      ["Java 17",           "LTS â€” modern language features"],
+      ["Java 17",           "LTS — modern language features"],
       ["Spring Data JPA",   "Repository abstraction, derived queries"],
       ["Hibernate ORM",     "Entity mapping, lazy/eager loading"],
       ["Maven",             "Build system, dependency management"],
-      ["Lombok",            "@Data @NoArgsConstructor â€” boilerplate"],
+      ["Lombok",            "@Data @NoArgsConstructor — boilerplate"],
       ["Jackson",           "JSON serialization, @JsonIgnore"],
-      ["Spring Mail",       "Gmail SMTP â€” OTP email delivery"],
+      ["Spring Mail",       "Gmail SMTP — OTP email delivery"],
     ]},
     { layer:"Database & Tools", color:"purple", items:[
-      ["MySQL 8.0",         "Relational DB â€” XAMPP local instance"],
+      ["MySQL 8.0",         "Relational DB — XAMPP local instance"],
       ["JPA DDL auto",      "Schema auto-created/updated on startup"],
       ["H2 (test scope)",   "In-memory DB for JUnit tests"],
       ["Git + GitHub",      "Version control, remote at github.com/Sumeet138/kilojoules"],
@@ -753,9 +753,9 @@ function SectionStack() {
   );
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -----------------------------------------------------------------------------
 // MAIN
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -----------------------------------------------------------------------------
 
 export default function SystemDesign() {
   const [active, setActive] = useState("overview");
@@ -779,7 +779,7 @@ export default function SystemDesign() {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}>
 
-      {/* â”€â”€ Top bar â”€â”€ */}
+      {/* == Top bar == */}
       <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-white border-b border-gray-200 flex items-center px-6 gap-4">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-orange-500 flex items-center justify-center flex-shrink-0">
@@ -792,18 +792,18 @@ export default function SystemDesign() {
         <div className="ml-auto flex items-center gap-3">
           <a href="https://github.com/Sumeet138/kilojoules" target="_blank" rel="noreferrer"
             className="text-xs text-gray-500 hover:text-gray-800 transition-colors hidden sm:block">
-            GitHub â†—
+            GitHub ↗
           </a>
           <Link to={backLink}
             className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors">
-            â† Back to App
+            ← Back to App
           </Link>
         </div>
       </header>
 
       <div className="flex pt-14">
 
-        {/* â”€â”€ Left sidebar â”€â”€ */}
+        {/* == Left sidebar == */}
         <aside className="hidden lg:flex flex-col fixed top-14 left-0 bottom-0 w-56 border-r border-gray-200 bg-white overflow-y-auto">
           <div className="p-5">
             <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">On this page</p>
@@ -823,7 +823,7 @@ export default function SystemDesign() {
           </div>
         </aside>
 
-        {/* â”€â”€ Main content â”€â”€ */}
+        {/* == Main content == */}
         <main className="flex-1 lg:ml-56 min-w-0">
           <div className="max-w-3xl mx-auto px-6 py-12 lg:py-16">
 
@@ -832,7 +832,7 @@ export default function SystemDesign() {
               <div className="text-xs font-semibold text-orange-500 uppercase tracking-widest mb-2">Documentation</div>
               <h1 className="text-4xl font-extrabold text-gray-900 mb-3">System Design</h1>
               <p className="text-gray-500 text-base">
-                Complete technical documentation for the Kilojoules Gym Management System â€” architecture, RBAC, auth flow, API reference, database schema, and tech stack.
+                Complete technical documentation for the Kilojoules Gym Management System — architecture, RBAC, auth flow, API reference, database schema, and tech stack.
               </p>
             </div>
 
@@ -848,7 +848,7 @@ export default function SystemDesign() {
 
             <Divider />
             <p className="text-center text-xs text-gray-400 pb-8">
-              Kilojoules Â· React 18 + Spring Boot 3.2 + MySQL Â· Built by Sumeet Sharma
+              Kilojoules · React 18 + Spring Boot 3.2 + MySQL · Built by Sumeet Sharma
             </p>
           </div>
         </main>
