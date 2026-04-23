@@ -25,6 +25,18 @@ export const fetchMemberBookings = createAsyncThunk(
   }
 );
 
+export const cancelBookingThunk = createAsyncThunk(
+  "classBooking/cancel",
+  async (bookingId, { rejectWithValue }) => {
+    try {
+      const response = await cancelBooking(bookingId);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to cancel booking");
+    }
+  }
+);
+
 const classBookingSlice = createSlice({
   name: "classBooking",
   initialState: { bookings: [], loading: false, error: null },
@@ -34,7 +46,11 @@ const classBookingSlice = createSlice({
       .addCase(bookClassThunk.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(bookClassThunk.fulfilled, (state, action) => { state.loading = false; state.bookings.push(action.payload); })
       .addCase(bookClassThunk.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
-      .addCase(fetchMemberBookings.fulfilled, (state, action) => { state.bookings = action.payload; });
+      .addCase(fetchMemberBookings.fulfilled, (state, action) => { state.bookings = action.payload; })
+      .addCase(cancelBookingThunk.fulfilled, (state, action) => {
+        const idx = state.bookings.findIndex((b) => b.id === action.payload.id);
+        if (idx !== -1) state.bookings[idx] = action.payload;
+      });
   },
 });
 
