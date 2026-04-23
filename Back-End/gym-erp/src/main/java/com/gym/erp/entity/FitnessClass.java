@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -58,6 +59,9 @@ public class FitnessClass {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(nullable = false, precision = 10, scale = 2, columnDefinition = "DECIMAL(10,2) DEFAULT 500.00")
+    private BigDecimal price = BigDecimal.valueOf(500.00);
 
     @JsonProperty("isActive")
     @Column(nullable = false)

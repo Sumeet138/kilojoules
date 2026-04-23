@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Typography, Button, Alert } from "@material-tailwind/react";
 import { fetchFitnessClasses } from "../../../store/slices/fitnessClassSlice";
 import { bookClassThunk, fetchMemberBookings } from "../../../store/slices/classBookingSlice";
-import { FiCalendar, FiClock, FiUser, FiCheck } from "react-icons/fi";
+import { FiCalendar, FiClock, FiUser, FiCheck, FiDollarSign } from "react-icons/fi";
 
 const CLASS_COLORS = {
   YOGA:     "bg-purple-100 text-purple-700",
@@ -34,10 +34,12 @@ export default function BookClasses() {
 
   const handleBook = async (classId) => {
     setSuccessMsg("");
+    const fc = classes.find((c) => c.id === classId);
     const result = await dispatch(bookClassThunk({ memberId: Number(memberId), classId }));
     if (bookClassThunk.fulfilled.match(result)) {
-      setSuccessMsg("Class booked successfully!");
-      setTimeout(() => setSuccessMsg(""), 3000);
+      const price = fc?.price ?? 500;
+      setSuccessMsg(`Class booked! ₹${price} transaction recorded as PENDING — admin will confirm payment.`);
+      setTimeout(() => setSuccessMsg(""), 5000);
       dispatch(fetchMemberBookings(memberId));
     }
   };
@@ -159,11 +161,14 @@ export default function BookClasses() {
                 <div className="flex flex-col gap-1.5 text-sm text-gray-500 mb-4">
                   <span className="flex items-center gap-1.5"><FiCalendar className="w-3.5 h-3.5" /> {fc.scheduledDay}</span>
                   <span className="flex items-center gap-1.5"><FiClock className="w-3.5 h-3.5" /> {fc.scheduledTime} · {fc.durationMinutes} min</span>
+                  <span className="flex items-center gap-1.5 font-semibold text-gym-warm">
+                    <FiDollarSign className="w-3.5 h-3.5" /> {'₹'}{fc.price ?? 500}
+                  </span>
                 </div>
 
                 {isBooked ? (
                   <div className="w-full text-center text-sm font-semibold text-green-600 bg-green-100 rounded-lg py-2">
-                    ✓ You are booked · {booking?.status}
+                    {'✓'} You are booked · {booking?.status}
                   </div>
                 ) : (
                   <Button
@@ -173,7 +178,7 @@ export default function BookClasses() {
                     size="sm"
                     className={`${isFull ? "bg-gray-300 cursor-not-allowed" : "bg-gradient-to-r from-gym-warm to-gym-warm-dark"} text-white`}
                   >
-                    {isFull ? "Fully Booked" : "Book Now"}
+                    {isFull ? "Fully Booked" : `Book Now · ₹${fc.price ?? 500}`}
                   </Button>
                 )}
               </div>

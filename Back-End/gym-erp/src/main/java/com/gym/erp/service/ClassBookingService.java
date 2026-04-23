@@ -3,12 +3,17 @@ package com.gym.erp.service;
 import com.gym.erp.entity.ClassBooking;
 import com.gym.erp.entity.FitnessClass;
 import com.gym.erp.entity.Member;
+import com.gym.erp.entity.Transaction;
 import com.gym.erp.entity.enums.BookingStatus;
+import com.gym.erp.entity.enums.PaymentMethod;
+import com.gym.erp.entity.enums.TransactionStatus;
+import com.gym.erp.entity.enums.TransactionType;
 import com.gym.erp.exception.CustomException;
 import com.gym.erp.exception.ResourceNotFoundException;
 import com.gym.erp.repository.ClassBookingRepository;
 import com.gym.erp.repository.FitnessClassRepository;
 import com.gym.erp.repository.MemberRepository;
+import com.gym.erp.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +32,9 @@ public class ClassBookingService {
 
     @Autowired
     private FitnessClassRepository classRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     public ClassBooking bookClass(Long memberId, Long classId) {
         Member member = memberRepository.findById(memberId)
@@ -52,7 +60,18 @@ public class ClassBookingService {
         fitnessClass.setCurrentEnrollment(fitnessClass.getCurrentEnrollment() + 1);
         classRepository.save(fitnessClass);
 
-        return bookingRepository.save(booking);
+        ClassBooking saved = bookingRepository.save(booking);
+
+        Transaction tx = new Transaction();
+        tx.setMember(member);
+        tx.setTransactionType(TransactionType.PERSONAL_TRAINER);
+        tx.setAmount(fitnessClass.getPrice() != null ? fitnessClass.getPrice() : java.math.BigDecimal.valueOf(500));
+        tx.setPaymentMethod(PaymentMethod.CASH);
+        tx.setStatus(TransactionStatus.PENDING);
+        tx.setDescription("Class booking: " + fitnessClass.getClassName());
+        transactionRepository.save(tx);
+
+        return saved;
     }
 
     public List<ClassBooking> getMemberBookings(Long memberId) {
