@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, CardBody, Typography, Input, Button, Alert } from "@material-tailwind/react";
 import { loginTrainerThunk } from "../../../store/slices/trainerSlice";
+import { SignInAutoFillButton } from "../../../components/TestAutoFillButton";
 import { FiActivity } from "react-icons/fi";
 
 export function TrainerSignIn() {
@@ -13,6 +14,17 @@ export function TrainerSignIn() {
   const [form, setForm] = useState({ username: "", password: "" });
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleAutoFill = (credentials) => {
+    setForm(credentials);
+  };
+
+  const handleQuickLogin = async (credentials) => {
+    const result = await dispatch(loginTrainerThunk(credentials));
+    if (loginTrainerThunk.fulfilled.match(result)) {
+      navigate("/dashboard/trainer/home");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,6 +51,10 @@ export function TrainerSignIn() {
           {typeof error === "string" ? error : "Invalid credentials. Please try again."}
         </Alert>
       )}
+
+      <div className="flex justify-end">
+        <SignInAutoFillButton onFill={handleAutoFill} onQuickLogin={handleQuickLogin} role="trainer" />
+      </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <div>

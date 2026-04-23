@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, CardBody, Typography, Input, Button, Alert } from "@material-tailwind/react";
 import { loginAdminThunk } from "../../../store/slices/adminSlice";
+import { SignInAutoFillButton } from "../../../components/TestAutoFillButton";
 import { FiShield } from "react-icons/fi";
 
 export function AdminSignIn() {
@@ -13,6 +14,17 @@ export function AdminSignIn() {
   const [form, setForm] = useState({ username: "", password: "" });
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleAutoFill = (credentials) => {
+    setForm(credentials);
+  };
+
+  const handleQuickLogin = async (credentials) => {
+    const result = await dispatch(loginAdminThunk(credentials));
+    if (loginAdminThunk.fulfilled.match(result)) {
+      navigate("/dashboard/admin/home");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,6 +51,10 @@ export function AdminSignIn() {
           {typeof error === "string" ? error : "Invalid credentials. Please try again."}
         </Alert>
       )}
+
+      <div className="flex justify-end">
+        <SignInAutoFillButton onFill={handleAutoFill} onQuickLogin={handleQuickLogin} role="admin" />
+      </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <div>
