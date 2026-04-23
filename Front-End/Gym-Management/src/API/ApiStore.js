@@ -115,10 +115,12 @@ export const bookClass = (memberId, classId) =>
 export const getMemberBookings = (memberId) =>
   api.get(`/bookings/member/${memberId}`);
 
-export const getClassBookings = (classId) =>
-  api.get(`/bookings/class/${classId}`);
+export const getClassBookings = (classId, date = null) =>
+  api.get(`/bookings/class/${classId}${date ? `?date=${date}` : ""}`);
 
 export const cancelBooking = (id) => api.put(`/bookings/${id}/cancel`);
+
+export const markBookingNoShow = (id) => api.put(`/bookings/${id}/no-show`);
 
 export const markBookingAttended = (id) => api.put(`/bookings/${id}/attend`);
 

@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -43,8 +44,9 @@ public class ClassBookingService {
         FitnessClass fitnessClass = classRepository.findById(classId)
                 .orElseThrow(() -> new ResourceNotFoundException("Fitness class not found with id: " + classId));
 
-        if (bookingRepository.existsByMemberIdAndFitnessClassId(memberId, classId)) {
-            throw new CustomException("Member has already booked this class.");
+        LocalDate today = LocalDate.now();
+        if (bookingRepository.existsByMemberIdAndFitnessClassIdAndBookingDate(memberId, classId, today)) {
+            throw new CustomException("Member has already booked this class for today.");
         }
 
         if (fitnessClass.getCurrentEnrollment() >= fitnessClass.getCapacity()) {
@@ -102,5 +104,19 @@ public class ClassBookingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + bookingId));
         booking.setStatus(BookingStatus.ATTENDED);
         return bookingRepository.save(booking);
+    }
+
+    public ClassBooking markNoShow(Long bookingId) {
+        ClassBooking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + bookingId));
+        booking.setStatus(BookingStatus.NO_SHOW);
+        return bookingRepository.save(booking);
+    }
+
+    public List<ClassBooking> getClassBookingsByDate(Long classId, LocalDate date) {
+        if (date != null) {
+            return bookingRepository.findByFitnessClassIdAndBookingDate(classId, date);
+        }
+        return bookingRepository.findByFitnessClassIdOrderByBookingDateDesc(classId);
     }
 }

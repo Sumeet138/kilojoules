@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -40,7 +41,12 @@ public class ClassBookingController {
     }
 
     @GetMapping("/class/{classId}")
-    public List<ClassBooking> getClassBookings(@PathVariable Long classId) {
+    public List<ClassBooking> getClassBookings(
+            @PathVariable Long classId,
+            @RequestParam(value = "date", required = false) String date) {
+        if (date != null && !date.isBlank()) {
+            return bookingService.getClassBookingsByDate(classId, LocalDate.parse(date));
+        }
         return bookingService.getClassBookings(classId);
     }
 
@@ -58,6 +64,16 @@ public class ClassBookingController {
     public ResponseEntity<?> markAttended(@PathVariable Long id) {
         try {
             ClassBooking booking = bookingService.markAttended(id);
+            return ResponseEntity.ok(booking);
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}/no-show")
+    public ResponseEntity<?> markNoShow(@PathVariable Long id) {
+        try {
+            ClassBooking booking = bookingService.markNoShow(id);
             return ResponseEntity.ok(booking);
         } catch (ResourceNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
