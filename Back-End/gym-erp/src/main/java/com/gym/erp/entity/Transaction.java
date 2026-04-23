@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,6 +29,12 @@ public class Transaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    @Column(name = "member_id", insertable = false, updatable = false)
+    private Long memberId;
+
+    @Formula("(SELECT CONCAT(m.first_name, ' ', m.last_name) FROM members m WHERE m.id = member_id)")
+    private String memberName;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)

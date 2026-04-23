@@ -18,4 +18,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.member.id = :memberId")
     BigDecimal sumAmountByMemberId(Long memberId);
+
+    @Query("SELECT t FROM Transaction t WHERE t.member.id IN " +
+           "(SELECT b.member.id FROM ClassBooking b WHERE b.fitnessClass.trainer.id = :trainerId " +
+           "AND b.status <> com.gym.erp.entity.enums.BookingStatus.CANCELLED) " +
+           "AND t.transactionType = com.gym.erp.entity.enums.TransactionType.PERSONAL_TRAINER " +
+           "ORDER BY t.transactionDate DESC")
+    List<Transaction> findByTrainerId(@org.springframework.data.repository.query.Param("trainerId") Long trainerId);
 }

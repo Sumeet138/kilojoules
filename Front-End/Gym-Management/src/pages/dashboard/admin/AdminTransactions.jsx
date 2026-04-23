@@ -118,7 +118,7 @@ export default function AdminTransactions() {
               {filtered.map((t, idx) => (
                 <tr key={t.id} className={`border-t border-gym-beige-dark ${idx % 2 === 0 ? "" : "bg-gym-beige/30"}`}>
                   <td className="px-4 py-3 text-gym-text-muted whitespace-nowrap">{t.transactionDate}</td>
-                  <td className="px-4 py-3 text-gym-text-primary whitespace-nowrap">{t.member ? `${t.member.firstName} ${t.member.lastName}` : "\u2014"}</td>
+                  <td className="px-4 py-3 text-gym-text-primary whitespace-nowrap">{t.memberName || (t.memberId ? `Member #${t.memberId}` : "\u2014")}</td>
                   <td className="px-4 py-3 text-gym-text-secondary whitespace-nowrap">{t.transactionType}</td>
                   <td className="px-4 py-3 text-gym-text-secondary max-w-[160px] truncate">{t.description || "\u2014"}</td>
                   <td className="px-4 py-3 text-gym-text-secondary whitespace-nowrap">{t.paymentMethod}</td>

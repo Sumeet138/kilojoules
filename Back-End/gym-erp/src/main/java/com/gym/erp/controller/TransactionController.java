@@ -54,6 +54,11 @@ public class TransactionController {
         return transactionService.getAllTransactions();
     }
 
+    @GetMapping("/trainer/{trainerId}")
+    public List<Transaction> getTrainerTransactions(@PathVariable Long trainerId) {
+        return transactionService.getTrainerTransactions(trainerId);
+    }
+
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam String status) {
         try {

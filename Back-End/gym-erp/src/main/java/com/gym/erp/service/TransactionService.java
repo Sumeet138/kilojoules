@@ -44,6 +44,10 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
+    public List<Transaction> getTrainerTransactions(Long trainerId) {
+        return transactionRepository.findByTrainerId(trainerId);
+    }
+
     public void deleteTransaction(Long id) {
         if (!transactionRepository.existsById(id)) {
             throw new ResourceNotFoundException("Transaction not found with id: " + id);

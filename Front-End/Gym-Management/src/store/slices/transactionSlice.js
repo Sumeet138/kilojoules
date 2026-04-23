@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getMemberTransactions, getAllTransactions, recordTransaction, updateTransactionStatus, deleteTransaction } from "../../API/ApiStore";
+import { getMemberTransactions, getAllTransactions, recordTransaction, updateTransactionStatus, deleteTransaction, getTrainerTransactions } from "../../API/ApiStore";
 
 export const fetchMemberTransactions = createAsyncThunk(
   "transaction/fetchByMember",
@@ -49,6 +49,18 @@ export const updateTransactionStatusThunk = createAsyncThunk(
   }
 );
 
+export const fetchTrainerTransactions = createAsyncThunk(
+  "transaction/fetchByTrainer",
+  async (trainerId, { rejectWithValue }) => {
+    try {
+      const response = await getTrainerTransactions(trainerId);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to fetch transactions");
+    }
+  }
+);
+
 export const deleteTransactionThunk = createAsyncThunk(
   "transaction/delete",
   async (id, { rejectWithValue }) => {
@@ -78,7 +90,10 @@ const transactionSlice = createSlice({
       })
       .addCase(deleteTransactionThunk.fulfilled, (state, action) => {
         state.transactions = state.transactions.filter((t) => t.id !== action.payload);
-      });
+      })
+      .addCase(fetchTrainerTransactions.pending, (state) => { state.loading = true; })
+      .addCase(fetchTrainerTransactions.fulfilled, (state, action) => { state.loading = false; state.transactions = action.payload; })
+      .addCase(fetchTrainerTransactions.rejected, (state, action) => { state.loading = false; state.error = action.payload; });
   },
 });
 

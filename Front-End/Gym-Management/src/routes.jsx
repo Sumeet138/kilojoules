@@ -52,6 +52,7 @@ const TrainerDietPlans = lazy(() => import("./pages/dashboard/trainer/TrainerDie
 const TrainerMembers = lazy(() => import("./pages/dashboard/trainer/TrainerMembers"));
 const TrainerNotifications = lazy(() => import("./pages/dashboard/trainer/TrainerNotifications"));
 const TrainerProfile = lazy(() => import("./pages/dashboard/trainer/TrainerProfile"));
+const TrainerTransactions = lazy(() => import("./pages/dashboard/trainer/TrainerTransactions"));
 
 // ---- Lazy admin dashboard ----
 const AdminHome = lazy(() => import("./pages/dashboard/admin/AdminHome"));
@@ -126,6 +127,7 @@ export const routes = [
       { path: "diet-plans", element: S(TrainerDietPlans) },
       { path: "members", element: S(TrainerMembers) },
       { path: "notifications", element: S(TrainerNotifications) },
+      { path: "transactions", element: S(TrainerTransactions) },
       { path: "profile", element: S(TrainerProfile) },
     ],
   },

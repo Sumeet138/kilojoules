@@ -36,6 +36,7 @@ const trainerRoutes = [
       { icon: FiCheckSquare, name: "Attendance",    path: "/attendance" },
       { icon: FiFeather,     name: "Diet Plans",    path: "/diet-plans" },
       { icon: FiUsers,       name: "My Members",    path: "/members" },
+      { icon: FiCreditCard,  name: "Payments",      path: "/transactions" },
       { icon: FiBell,        name: "Notifications", path: "/notifications" },
       { icon: FiUser,        name: "Profile",       path: "/profile" },
     ],

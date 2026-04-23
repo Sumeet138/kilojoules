@@ -178,6 +178,9 @@ export const updateTransactionStatus = (id, status) =>
 
 export const deleteTransaction = (id) => api.delete(`/transactions/${id}`);
 
+export const getTrainerTransactions = (trainerId) =>
+  api.get(`/transactions/trainer/${trainerId}`);
+
 // ===== NOTIFICATIONS =====
 export const createNotification = (data) => api.post("/notifications", data);
 
