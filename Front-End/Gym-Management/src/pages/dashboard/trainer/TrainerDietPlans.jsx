@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Typography, Button, Input, Alert } from "@material-tailwind/react";
 import { fetchDietPlans } from "../../../store/slices/dietPlanSlice";
-import { getAllMembers, createDietPlan, deleteDietPlan } from "../../../API/ApiStore";
-import { FiFeather } from "react-icons/fi";
+import { getAllMembers, createDietPlan, updateDietPlan, deleteDietPlan } from "../../../API/ApiStore";
+import { FiFeather, FiEdit2, FiCheck, FiX } from "react-icons/fi";
 
 const EMPTY_FORM = {
   memberId: "", planName: "", description: "",
@@ -21,6 +21,9 @@ export default function TrainerDietPlans() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [form, setForm] = useState(EMPTY_FORM);
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     getAllMembers().then((r) => setMembers(r.data || [])).catch(() => {});
@@ -49,6 +52,33 @@ export default function TrainerDietPlans() {
       setError(err.response?.data || "Failed to create plan.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const startEdit = (plan) => {
+    setEditingId(plan.id);
+    setEditForm({
+      planName: plan.planName,
+      description: plan.description || "",
+      totalCalories: plan.totalCalories,
+      proteinGrams: plan.proteinGrams,
+      carbsGrams: plan.carbsGrams,
+      fatsGrams: plan.fatsGrams,
+    });
+  };
+
+  const handleEditSave = async (id) => {
+    setSaving(true);
+    try {
+      await updateDietPlan(id, editForm);
+      setSuccess("Plan updated!");
+      setEditingId(null);
+      if (selectedMemberId) dispatch(fetchDietPlans(selectedMemberId));
+      setTimeout(() => setSuccess(""), 3000);
+    } catch {
+      setError("Failed to update plan.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -169,37 +199,73 @@ export default function TrainerDietPlans() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {plans.map((plan) => (
                 <div key={plan.id} className="bg-gym-cream border border-gym-beige-dark rounded-xl p-5 shadow-sm">
-                  <div className="flex items-start justify-between mb-1">
-                    <Typography variant="h6" className="font-bold text-gym-text-primary">
-                      {plan.planName}
-                    </Typography>
-                    <Button
-                      size="sm"
-                      variant="text"
-                      onClick={() => handleDelete(plan.id)}
-                      className="text-red-500 p-0"
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                  <Typography variant="small" className="text-gym-text-muted mb-4">
-                    {plan.description}
-                  </Typography>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { label: "Calories", value: plan.totalCalories, unit: "kcal", color: "bg-orange-50 text-orange-700" },
-                      { label: "Protein", value: plan.proteinGrams, unit: "g", color: "bg-blue-50 text-blue-700" },
-                      { label: "Carbs", value: plan.carbsGrams, unit: "g", color: "bg-yellow-50 text-yellow-700" },
-                      { label: "Fats", value: plan.fatsGrams, unit: "g", color: "bg-red-50 text-red-700" },
-                    ].map(({ label, value, unit, color }) => (
-                      <div key={label} className={`rounded-lg p-3 ${color}`}>
-                        <Typography variant="small" className="font-medium">{label}</Typography>
-                        <Typography variant="h6" className="font-bold">
-                          {value ?? "—"} <span className="text-xs font-normal">{unit}</span>
-                        </Typography>
+                  {editingId === plan.id ? (
+                    <>
+                      <div className="grid grid-cols-1 gap-2 mb-3">
+                        {[
+                          { label: "Plan Name",      name: "planName",      type: "text"   },
+                          { label: "Description",    name: "description",   type: "text"   },
+                          { label: "Calories (kcal)",name: "totalCalories", type: "number" },
+                          { label: "Protein (g)",    name: "proteinGrams",  type: "number" },
+                          { label: "Carbs (g)",      name: "carbsGrams",    type: "number" },
+                          { label: "Fats (g)",       name: "fatsGrams",     type: "number" },
+                        ].map(({ label, name, type }) => (
+                          <div key={name}>
+                            <p className="text-xs text-gym-text-muted mb-0.5">{label}</p>
+                            <Input
+                              type={type}
+                              value={editForm[name]}
+                              onChange={(e) => setEditForm({ ...editForm, [name]: e.target.value })}
+                              className="!border-gym-beige-dark focus:!border-gym-warm bg-white"
+                              labelProps={{ className: "hidden" }}
+                            />
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" loading={saving} onClick={() => handleEditSave(plan.id)}
+                          className="bg-green-500 text-white flex items-center gap-1">
+                          <FiCheck className="w-3.5 h-3.5" /> Save
+                        </Button>
+                        <Button size="sm" variant="outlined" onClick={() => setEditingId(null)}
+                          className="border-gray-300 text-gray-500 flex items-center gap-1">
+                          <FiX className="w-3.5 h-3.5" /> Cancel
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-start justify-between mb-1">
+                        <Typography variant="h6" className="font-bold text-gym-text-primary">{plan.planName}</Typography>
+                        <div className="flex gap-1">
+                          <button onClick={() => startEdit(plan)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-gym-warm hover:bg-gym-beige transition-colors">
+                            <FiEdit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button onClick={() => handleDelete(plan.id)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                            <FiX className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                      <Typography variant="small" className="text-gym-text-muted mb-4">{plan.description}</Typography>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          { label: "Calories", value: plan.totalCalories, unit: "kcal", color: "bg-orange-50 text-orange-700" },
+                          { label: "Protein",  value: plan.proteinGrams,  unit: "g",    color: "bg-blue-50 text-blue-700"   },
+                          { label: "Carbs",    value: plan.carbsGrams,    unit: "g",    color: "bg-yellow-50 text-yellow-700"},
+                          { label: "Fats",     value: plan.fatsGrams,     unit: "g",    color: "bg-red-50 text-red-700"     },
+                        ].map(({ label, value, unit, color }) => (
+                          <div key={label} className={`rounded-lg p-3 ${color}`}>
+                            <Typography variant="small" className="font-medium">{label}</Typography>
+                            <Typography variant="h6" className="font-bold">
+                              {value ?? "—"} <span className="text-xs font-normal">{unit}</span>
+                            </Typography>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
