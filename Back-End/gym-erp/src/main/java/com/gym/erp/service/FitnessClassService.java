@@ -56,6 +56,7 @@ public class FitnessClassService {
         existing.setDurationMinutes(updated.getDurationMinutes());
         existing.setCapacity(updated.getCapacity());
         existing.setDescription(updated.getDescription());
+        existing.setPrice(updated.getPrice());
         existing.setActive(updated.isActive());
         if (updated.getTrainer() != null) {
             existing.setTrainer(updated.getTrainer());

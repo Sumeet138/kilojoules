@@ -37,16 +37,15 @@ export default function BookClasses() {
     const fc = classes.find((c) => c.id === classId);
     const result = await dispatch(bookClassThunk({ memberId: Number(memberId), classId }));
     if (bookClassThunk.fulfilled.match(result)) {
-      const price = fc?.price ?? 500;
-      setSuccessMsg(`Class booked! ₹${price} transaction recorded as PENDING — admin will confirm payment.`);
-      setTimeout(() => setSuccessMsg(""), 5000);
+      setSuccessMsg(`Booking request sent! ⏳ Waiting for admin approval. You'll be notified once approved.`);
+      setTimeout(() => setSuccessMsg(""), 6000);
       dispatch(fetchMemberBookings(memberId));
     }
   };
 
   const activeBookedClassIds = new Set(
     bookings
-      .filter((b) => b.status === "BOOKED" || b.status === "ATTENDED")
+      .filter((b) => ["PENDING_APPROVAL", "BOOKED", "ATTENDED"].includes(b.status))
       .map((b) => b.fitnessClass?.id)
       .filter(Boolean)
   );
@@ -167,8 +166,12 @@ export default function BookClasses() {
                 </div>
 
                 {isBooked ? (
-                  <div className="w-full text-center text-sm font-semibold text-green-600 bg-green-100 rounded-lg py-2">
-                    {'✓'} You are booked · {booking?.status}
+                  <div className={`w-full text-center text-sm font-semibold rounded-lg py-2 ${
+                    booking?.status === "PENDING_APPROVAL"
+                      ? "text-yellow-700 bg-yellow-100"
+                      : "text-green-600 bg-green-100"
+                  }`}>
+                    {booking?.status === "PENDING_APPROVAL" ? "⏳ Awaiting Admin Approval" : "✓ Booked · " + booking?.status}
                   </div>
                 ) : (
                   <Button
