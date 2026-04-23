@@ -130,8 +130,8 @@ export default function TrainerAttendance() {
                   <tbody>
                     {bookings.map((b, idx) => (
                       <tr key={b.id} className={`border-t border-gym-beige-dark ${idx % 2 === 0 ? "" : "bg-gym-beige/30"}`}>
-                        <td className="px-3 py-2 text-gym-text-primary">
-                          {b.member ? `${b.member.firstName} ${b.member.lastName}` : b.memberId}
+                        <td className="px-3 py-2 text-gym-text-primary font-medium">
+                          {b.memberName || (b.memberId ? `Member #${b.memberId}` : "\u2014")}
                         </td>
                         <td className="px-3 py-2 text-gym-text-muted">{b.bookingDate}</td>
                         <td className="px-3 py-2">
